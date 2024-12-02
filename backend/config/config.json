@@ -1,0 +1,23 @@
+{
+  "development": {
+    "username": "postgres",
+    "password": "1234567890",
+    "database": "Dicoding-GenAI",
+    "host": "localhost",
+    "dialect": "postgres"
+  },
+  "test": {
+    "username": "postgres",
+    "password": "1234567890",
+    "database": "Dicoding-GenAI",
+    "host": "localhost",
+    "dialect": "postgres"
+  },
+  "production": {
+    "username": "postgres",
+    "password": "1234567890",
+    "database": "Dicoding-GenAI",
+    "host": "localhost",
+    "dialect": "postgres"
+  }
+}

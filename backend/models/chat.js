@@ -1,34 +1,25 @@
-import mongoose from "mongoose";
+// models/chat.js
+import { DataTypes } from 'sequelize';
+import { sequelize } from './db.js';
+import { v4 as uuidv4 } from 'uuid';  // Import UUID library
 
-const chatSchema = new mongoose.Schema(
-  {
-    userId: {
-      type: String,
-      required: true,
-    },
-    history: [
-      {
-        role: {
-          type: String,
-          enum: ["user", "model"],
-          required: true,
-        },
-        parts: [
-          {
-            text: {
-              type: String,
-              required: true,
-            },
-          },
-        ],
-        img: {
-          type: String,
-          required: false,
-        },
-      },
-    ],
+const Chat = sequelize.define('Chat', {
+  _id: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    primaryKey: true,
+    defaultValue: () => uuidv4(),  // Generate a unique ID using UUID v4
   },
-  { timestamps: true }
-);
+  userId: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  history: {
+    type: DataTypes.JSONB,  // Storing chat history as JSON
+    allowNull: false,
+  },
+}, {
+  timestamps: true,
+});
 
-export default mongoose.models.chat || mongoose.model("chat", chatSchema);
+export default Chat;

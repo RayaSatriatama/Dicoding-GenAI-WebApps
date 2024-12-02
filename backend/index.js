@@ -3,11 +3,11 @@ import cors from "cors";
 import path from "path";
 import url, { fileURLToPath } from "url";
 import ImageKit from "imagekit";
-import mongoose from "mongoose";
-import Chat from "./models/chat.js";
-import UserChats from "./models/userChats.js";
 import { ClerkExpressRequireAuth } from "@clerk/clerk-sdk-node";
 import dotenv from "dotenv";
+import { sequelize, connect } from './models/db.js';
+import Chat from "./models/chat.js";
+import UserChats from "./models/userChat.js";
 
 // Load environment variables from .env file
 dotenv.config();
@@ -27,15 +27,6 @@ app.use(
 
 app.use(express.json());
 
-const connect = async () => {
-  try {
-    await mongoose.connect(process.env.MONGO);
-    console.log("Connected to MongoDB");
-  } catch (err) {
-    console.log(err);
-  }
-};
-
 const imagekit = new ImageKit({
   urlEndpoint: process.env.IMAGE_KIT_ENDPOINT,
   publicKey: process.env.IMAGE_KIT_PUBLIC_KEY,
@@ -53,45 +44,39 @@ app.post("/api/chats", ClerkExpressRequireAuth(), async (req, res) => {
 
   try {
     // CREATE A NEW CHAT
-    const newChat = new Chat({
+    const newChat = await Chat.create({
       userId: userId,
       history: [{ role: "user", parts: [{ text }] }],
     });
 
-    const savedChat = await newChat.save();
-
     // CHECK IF THE USERCHATS EXISTS
-    const userChats = await UserChats.find({ userId: userId });
+    const userChats = await UserChats.findOne({ where: { userId: userId } });
 
-    // IF DOESN'T EXIST CREATE A NEW ONE AND ADD THE CHAT IN THE CHATS ARRAY
-    if (!userChats.length) {
-      const newUserChats = new UserChats({
+    if (!userChats) {
+      // IF DOESN'T EXIST CREATE A NEW ONE AND ADD THE CHAT IN THE CHATS ARRAY
+      await UserChats.create({
         userId: userId,
         chats: [
           {
-            _id: savedChat._id,
+            _id: newChat._id,
             title: text.substring(0, 40),
           },
         ],
       });
-
-      await newUserChats.save();
     } else {
-      // IF EXISTS, PUSH THE CHAT TO THE EXISTING ARRAY
-      await UserChats.updateOne(
-        { userId: userId },
-        {
-          $push: {
-            chats: {
-              _id: savedChat._id,
-              title: text.substring(0, 40),
-            },
-          },
-        }
-      );
+      // MAKE SURE chats is always an array
+      const chats = Array.isArray(userChats.chats) ? userChats.chats : [];
 
-      res.status(201).send(newChat._id);
+      // IF EXISTS, PUSH THE CHAT TO THE EXISTING ARRAY
+      await userChats.update({
+        chats: [
+          ...chats,
+          { _id: newChat._id, title: text.substring(0, 40) },
+        ],
+      });
     }
+
+    res.status(201).send(newChat._id);
   } catch (err) {
     console.log(err);
     res.status(500).send("Error creating chat!");
@@ -102,9 +87,19 @@ app.get("/api/userchats", ClerkExpressRequireAuth(), async (req, res) => {
   const userId = req.auth.userId;
 
   try {
-    const userChats = await UserChats.find({ userId });
+    const userChats = await UserChats.findOne({
+      where: { userId },
+      include: {
+        model: Chat,
+        as: 'chats',
+      },
+    });
 
-    res.status(200).send(userChats[0].chats);
+    if (userChats) {
+      res.status(200).send(userChats.chats);
+    } else {
+      res.status(404).send("No chats found for this user!");
+    }
   } catch (err) {
     console.log(err);
     res.status(500).send("Error fetching userchats!");
@@ -115,18 +110,22 @@ app.get("/api/chats/:id", ClerkExpressRequireAuth(), async (req, res) => {
   const userId = req.auth.userId;
 
   try {
-    const chat = await Chat.findOne({ _id: req.params.id, userId });
+    const chat = await Chat.findOne({ where: { _id: req.params.id, userId } });
 
-    res.status(200).send(chat);
+    if (chat) {
+      res.status(200).send(chat);
+    } else {
+      res.status(404).send("Chat not found!");
+    }
   } catch (err) {
     console.log(err);
     res.status(500).send("Error fetching chat!");
   }
 });
 
+
 app.put("/api/chats/:id", ClerkExpressRequireAuth(), async (req, res) => {
   const userId = req.auth.userId;
-
   const { question, answer, img } = req.body;
 
   const newItems = [
@@ -137,16 +136,11 @@ app.put("/api/chats/:id", ClerkExpressRequireAuth(), async (req, res) => {
   ];
 
   try {
-    const updatedChat = await Chat.updateOne(
-      { _id: req.params.id, userId },
-      {
-        $push: {
-          history: {
-            $each: newItems,
-          },
-        },
-      }
+    const updatedChat = await Chat.update(
+      { history: sequelize.fn('array_append', sequelize.col('history'), newItems) },
+      { where: { _id: req.params.id, userId } }
     );
+
     res.status(200).send(updatedChat);
   } catch (err) {
     console.log(err);
@@ -158,24 +152,19 @@ app.delete("/api/chats/:id", ClerkExpressRequireAuth(), async (req, res) => {
   const userId = req.auth.userId;
   const chatId = req.params.id;
 
-  console.log(`Attempting to delete chat with ID: ${chatId} for user ID: ${userId}`);
-
   try {
-    // Find and delete the chat
-    const deletedChat = await Chat.findOneAndDelete({ _id: chatId, userId });
+    const deletedChat = await Chat.destroy({ where: { _id: chatId, userId } });
 
-    if (!deletedChat) {
-      console.log("Chat not found or does not belong to the user.");
-      return res.status(404).send("Chat not found!");
+    if (deletedChat) {
+      await UserChats.update(
+        { userId: userId },
+        { $pull: { chats: { _id: chatId } } }
+      );
+
+      res.status(200).send("Chat deleted successfully!");
+    } else {
+      res.status(404).send("Chat not found or does not belong to the user.");
     }
-
-    // Optionally, remove the chat from UserChats if necessary
-    await UserChats.updateOne(
-      { userId: userId },
-      { $pull: { chats: { _id: chatId } } }
-    );
-
-    res.status(200).send("Chat deleted successfully!");
   } catch (err) {
     console.log(err);
     res.status(500).send("Error deleting chat!");
@@ -194,7 +183,7 @@ app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "../client/dist", "index.html"));
 });
 
-app.listen(port, () => {
-  connect();
-  console.log("Server running on 3000");
+app.listen(port, async () => {
+  await connect();
+  console.log(`Server running on port ${port}`);
 });
