@@ -3,50 +3,79 @@
 }
 
 .newForm {
-  width: 80%;
-  position: absolute;
-  bottom: 0;
+  width: 80vw;
+  max-width: 800px;
+  position: fixed;
+  left: 58%;
+  transform: translateX(-50%);
+  bottom: 40px;
   background-color: #ececec;
   border-radius: 20px;
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 10px;
   padding: 0px 10px;
   box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
-  margin-bottom: 20px;
+  margin: 0 20px;
+}
 
-  input {
-    flex: 1;
-    padding: 20px 10px;
-    border: none;
-    outline: none;
-    background-color: transparent;
-    color: #2c2937;
-  }
+.newForm input {
+  flex: 1;
+  padding: 20px 10px;
+  border: none;
+  outline: none;
+  background-color: transparent;
+  color: #2c2937;
+}
 
-  button,
-  label {
-    color: #2c2937;
-    border-radius: 50%;
-    background-color: #ececec;
-    border: none;
-    padding: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: background-color 0.3s;
+.newForm button,
+.newForm label {
+  color: #2c2937;
+  border-radius: 50%;
+  background-color: #ececec;
+  border: none;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
 
-    img {
-      width: 16px;
-      height: 16px;
-    }
-  }
+.newForm button img,
+.newForm label img {
+  width: 16px;
+  height: 16px;
+}
 
-  button:hover,
-  label:hover {
-    color: #ececec;
-    background-color: #dcdbdb;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+.newForm button:hover,
+.newForm label:hover {
+  color: #ececec;
+  background-color: #dcdbdb;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+@media (max-width: 1024px) {
+  .newForm {
+    width: 70vw;
   }
 }
+
+@media (max-width: 768px) {
+  .newForm {
+    width: 60vw;
+    margin: 0 5vw;
+  }
+}
+
+@media (max-width: 480px) {
+  .newForm input {
+    padding: 15px 10px;
+  }
+
+  .newForm button,
+  .newForm label {
+    padding: 8px;
+  }
+}
+

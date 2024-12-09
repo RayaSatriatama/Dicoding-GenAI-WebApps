@@ -4,7 +4,10 @@ import { useQuery } from "@tanstack/react-query";
 import { useLocation } from "react-router-dom";
 import Markdown from "react-markdown";
 import { IKImage } from "imagekitio-react";
-import React from 'react';
+import React, { useState } from 'react';
+import TypingAnimation from '../../style/TypingAnimation';
+
+const speed = 1;
 
 const ChatPage = () => {
   const path = useLocation().pathname;
@@ -24,13 +27,107 @@ const ChatPage = () => {
       }),
   });
 
-  console.log(data);
+  const isValidJSON = (str) => {
+    try {
+      JSON.parse(str);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  };
+
+  const renderQuestionForm = (questions) => {
+    return questions.map((question) => {
+      switch (question.type) {
+        case "multiple_choice":
+          return (
+            <div key={question.id}>
+              <b>
+                <TypingAnimation text={`Pertanyaan: ${question.question}`} speed={speed} />
+              </b>
+              {question.options.map((option) => (
+                <div key={option.id} style={{ display: 'flex', alignItems: 'center' }}>
+                  <input type="radio" id={option.id} name={question.id} />
+                  <label htmlFor={option.id} style={{ marginLeft: '8px' }}>
+                    <TypingAnimation text={option.text} speed={speed} />
+                  </label>
+                </div>
+              ))}
+              <br />
+              <b>
+                <TypingAnimation text={`Jawaban: ${String(question.correct_answer)}`} speed={speed} />
+              </b>
+              <b>
+                <TypingAnimation text={`Penjelasan: ${question.explanation}`} speed={speed} />
+              </b>
+              <br />
+            </div>
+          );
+        case "multibox":
+          return (
+            <div key={question.id}>
+              <b>
+                <TypingAnimation text={`Pertanyaan: ${question.question}`} speed={speed} />
+              </b>
+              {question.options.map((option) => (
+                <div key={option.id} style={{ display: 'flex', alignItems: 'center' }}>
+                  <input type="checkbox" id={option.id} name={question.id} />
+                  <label htmlFor={option.id} style={{ marginLeft: '8px' }}>
+                    <TypingAnimation text={option.text} speed={speed} />
+                  </label>
+                </div>
+              ))}
+              <br />
+              <b>
+                <TypingAnimation text={`Jawaban: ${String(question.correct_answer)}`} speed={speed} />
+              </b>
+              <b>
+                <TypingAnimation text={`Penjelasan: ${question.explanation}`} speed={speed} />
+              </b>
+              <br />
+            </div>
+          );
+        case "true_false":
+          return (
+            <div key={question.id}>
+              <b>
+                <TypingAnimation text={`Pertanyaan: ${question.question}`} speed={speed} />
+              </b>
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                <input type="radio" id={`true-${question.id}`} name={question.id} />
+                <label htmlFor={`true-${question.id}`} style={{ marginLeft: '8px' }}>
+                  <TypingAnimation text="True" speed={speed} />
+                </label>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                <input type="radio" id={`false-${question.id}`} name={question.id} />
+                <label htmlFor={`false-${question.id}`} style={{ marginLeft: '8px' }}>
+                  <TypingAnimation text="False" speed={speed} />
+                </label>
+              </div>
+              <br />
+              <b>
+                <TypingAnimation text={`Jawaban: ${String(question.correct_answer)}`} speed={speed} />
+              </b>
+              <b>
+                <TypingAnimation text={`Penjelasan: ${question.explanation}`} speed={speed} />
+              </b>
+              <br />
+            </div>
+          );
+        default:
+          return null;
+      }
+    });
+  };
+
+  const [loadingMessages, setLoadingMessages] = useState(false);
 
   return (
     <div className="chatPage">
       <div className="wrapper">
         <div className="chat">
-          {isPending ? (
+          {isPending || loadingMessages ? (
             <div className="loading-spinner"></div>
           ) : error ? (
             "Something went wrong!"
@@ -53,13 +150,17 @@ const ChatPage = () => {
                 )}
                 <div
                   className={message.role === "user" ? "message user" : "message"}
+                  onLoad={() => setLoadingMessages(false)}
                 >
-                  <Markdown>{message.parts[0].text}</Markdown>
+                  {isValidJSON(message.parts[0].text) ? (
+                    renderQuestionForm(JSON.parse(message.parts[0].text).questions)
+                  ) : (
+                    <TypingAnimation text={message.parts[0].text} speed={speed} />
+                  )}
                 </div>
               </React.Fragment>
             ))
           )}
-
           {data && <NewPrompt data={data} />}
         </div>
       </div>

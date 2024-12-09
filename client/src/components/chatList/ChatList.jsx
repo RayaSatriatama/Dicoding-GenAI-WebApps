@@ -1,6 +1,8 @@
+// src/components/ChatList.jsx
 import { Link, useNavigate } from "react-router-dom";
 import "./chatList.css";
 import { useQuery } from "@tanstack/react-query";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 const ChatList = () => {
   const navigate = useNavigate();
@@ -11,7 +13,9 @@ const ChatList = () => {
         credentials: "include",
       });
       const chats = await response.json();
-      return chats.sort((a, b) => new Date(a.updatedAt) - new Date(b.updatedAt)).reverse();
+      return chats
+        .sort((a, b) => new Date(a.updatedAt) - new Date(b.updatedAt))
+        .reverse();
     },
   });
 
@@ -44,48 +48,52 @@ const ChatList = () => {
       <span className="title">DASHBOARD</span>
       <Link to="/dashboard">
         <div className="link-container">
-          Create a new Chat
+          Buat Chat Baru
         </div>
       </Link>
       <Link to="/">
         <div className="link-container">
-          Explore
+          Jelajahi
         </div>
       </Link>
       <Link to="/">
         <div className="link-container">
-          Contact
+          Hubungi Kami
         </div>
       </Link>
       <hr />
-      <span className="title">RECENT CHATS</span>
-      <div className="list">
+      <span className="title">CHAT TERKINI</span>
+
+      {/* Menggunakan ScrollArea di sini */}
+      <ScrollArea className="chat-scroll-area">
         {isPending ? (
           <div className="loading-spinner"></div>
         ) : error ? (
-          "Something went wrong!"
+          "Terjadi kesalahan!"
         ) : (
-          data?.reverse().map((chat) => (
-            <div key={chat._id}>
-              <Link to={`/dashboard/chats/${chat._id}`}>
-                <div className="link-container">
-                  <div className="chat-title">
-                    {chat.title}
+          <div className="list">
+            {data?.map((chat) => (
+              <div key={chat._id}>
+                <Link to={`/dashboard/chats/${chat._id}`}>
+                  <div className="link-container">
+                    <div className="chat-title">
+                      {chat.title}
+                    </div>
+                    <div className="fadeblock">
+                      <button onClick={() => handleDelete(chat._id)} className="delete-button">
+                        <svg data-name="Layer 2" id="b1bec25a-a443-4da7-b443-3916ea7ea246" viewBox="0 0 35 35" xmlns="http://www.w3.org/2000/svg" width="24" height="24">
+                          <path d="M28.814,30.064a1.247,1.247,0,0,1-.884-.367L5.3,7.07A1.249,1.249,0,0,1,7.07,5.3L29.7,27.93a1.251,1.251,0,0,1-.884,2.134Z" />
+                          <path d="M6.186,30.064A1.251,1.251,0,0,1,5.3,27.93L27.93,5.3A1.25,1.25,0,0,1,29.7,7.07L7.07,29.7A1.247,1.247,0,0,1,6.186,30.064Z" />
+                        </svg>
+                      </button>
+                    </div>
                   </div>
-                  <div className="fadeblock">
-                    <button onClick={() => handleDelete(chat._id)} className="delete-button">
-                      <svg data-name="Layer 2" id="b1bec25a-a443-4da7-b443-3916ea7ea246" viewBox="0 0 35 35" xmlns="http://www.w3.org/2000/svg" width="24" height="24">
-                        <path d="M28.814,30.064a1.247,1.247,0,0,1-.884-.367L5.3,7.07A1.249,1.249,0,0,1,7.07,5.3L29.7,27.93a1.251,1.251,0,0,1-.884,2.134Z" />
-                        <path d="M6.186,30.064A1.251,1.251,0,0,1,5.3,27.93L27.93,5.3A1.25,1.25,0,0,1,29.7,7.07L7.07,29.7A1.247,1.247,0,0,1,6.186,30.064Z" />
-                      </svg>
-                    </button>
-                  </div>
-                </div>
-              </Link>
-            </div>
-          ))
+                </Link>
+              </div>
+            ))}
+          </div>
         )}
-      </div>
+      </ScrollArea>
     </div>
   );
 };

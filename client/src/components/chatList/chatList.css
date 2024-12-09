@@ -1,3 +1,4 @@
+/* src/components/chatList.css */
 .chatList {
   display: flex;
   flex-direction: column;
@@ -19,16 +20,22 @@
     margin-bottom: 16px;
   }
 
+  /* Gaya untuk ScrollArea */
+  .chat-scroll-area {
+    flex: 1; /* Mengambil sisa ruang yang tersedia */
+    max-height: 400px; /* Atur sesuai kebutuhan atau gunakan unit relatif */
+    overflow-y: auto; /* Hanya scroll vertikal */
+    padding-right: 10px; /* Menambahkan padding untuk menggeser konten ke kiri */
+    box-sizing: content-box; /* Pastikan padding tidak mempengaruhi lebar */
+    /* Tambahkan background jika diperlukan */
+  }
+
   .list {
     display: flex;
     flex-direction: column;
-    overflow: auto;
-    transition: max-height 0.3s ease-out;
-
-    &.show {
-      max-height: 18rem;
-      overflow: scroll;
-    }
+    /* Hapus overflow karena ScrollArea sudah mengurusi scroll */
+    /* overflow: auto; */
+    /* transition: max-height 0.3s ease-out; */
   }
 
   .link-container {
@@ -42,7 +49,7 @@
     white-space: nowrap;
     overflow: hidden;
     flex-wrap: nowrap;
-    width: 15.625vw;
+    width: 100%; /* Sesuaikan dengan ScrollArea */
     box-sizing: border-box;
 
     &:hover {
@@ -101,21 +108,30 @@
     }
   }
 
-  &::-webkit-scrollbar {
-    width: 8px;
+  /* Gaya Scrollbar khusus */
+  .chat-scroll-area::-webkit-scrollbar {
+    width: 12px; /* Lebar scrollbar */
   }
 
-  &::-webkit-scrollbar-track {
+  .chat-scroll-area::-webkit-scrollbar-track {
     background-color: #f1f1f1;
+    border-radius: 6px;
   }
 
-  &::-webkit-scrollbar-thumb {
-    background-color: #888;
-    border-radius: 4px;
+  .chat-scroll-area::-webkit-scrollbar-thumb {
+    background-color: #888; /* Warna scrollbar */
+    border-radius: 6px;
+    border: 3px solid #f1f1f1; /* Memberi jarak 10px secara visual */
   }
 
-  &::-webkit-scrollbar-thumb:hover {
+  .chat-scroll-area::-webkit-scrollbar-thumb:hover {
     background-color: #555;
+  }
+
+  /* Untuk Firefox */
+  .chat-scroll-area {
+    scrollbar-width: thin; /* Pilihan: auto, thin */
+    scrollbar-color: #888 #f1f1f1; /* scrollbar-color: thumb track */
   }
 }
 
@@ -175,15 +191,6 @@
   }
 }
 
-/* @keyframes running-text {
-  0% {
-    transform: translateY(-50%) translateX(0);
-  }
-  100% {
-    transform: translateY(-50%) translateX(100%);
-  }
-} */
-
 @media (max-width: 768px) {
   .link-container {
     padding: 8px;
@@ -201,5 +208,15 @@
 
   .chat-title {
     max-width: 50%;
+  }
+}
+
+/* Animasi teks berjalan jika diperlukan */
+@keyframes running-text {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(100%);
   }
 }

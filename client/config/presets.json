@@ -1,0 +1,21 @@
+{
+  "Gemini": {
+    "models": ["gemini-pro", "gemini-pro-vision"],
+    "maxTokens": 2048,
+    "temperature": 0.7,
+    "topK": 40,
+    "topP": 0.95,
+    "agentStyles": ["Concise", "Balanced", "Creative"],
+    "documents": ["None", "General Knowledge", "Code Documentation"]
+  },
+  "Ollama": {
+    "models": ["llama2", "mistral", "codellama"],
+    "maxTokens": 4096,
+    "temperature": 0.8,
+    "topK": 50,
+    "topP": 0.9,
+    "agentStyles": ["Technical", "Friendly", "Professional"],
+    "documents": ["None", "Scientific Papers", "Legal Documents"]
+  }
+}
+

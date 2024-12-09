@@ -15,13 +15,16 @@ const DashboardPage = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ text }),
+        body: JSON.stringify({ text, isInitial: true }),
       }).then((res) => res.json());
     },
     onSuccess: (id) => {
-      // Invalidate and refetch
+      console.log(id);
       queryClient.invalidateQueries({ queryKey: ["userChats"] });
       navigate(`/dashboard/chats/${id}`);
+    },
+    onError: (error) => {
+      console.error("Error creating chat:", error);
     },
   });
 
@@ -41,21 +44,21 @@ const DashboardPage = () => {
         <div className="options">
           <div className="option">
             <img src="/chat.png" alt="" />
-            <span>Create a New Chat</span>
+            <span>Buat Soal Baru</span>
           </div>
           <div className="option">
             <img src="/image.png" alt="" />
-            <span>Analyze Images</span>
+            <span>Analisis Dokumen</span>
           </div>
           <div className="option">
             <img src="/code.png" alt="" />
-            <span>Help me with my Code</span>
+            <span>Bantu Saya</span>
           </div>
         </div>
       </div>
       <div className="formContainer">
         <form onSubmit={handleSubmit}>
-          <input type="text" name="text" placeholder="Ask me anything..." />
+          <input type="text" name="text" placeholder="Tanyakan apa saja..." />
           <button>
           <svg
             viewBox="0 0 384 512"

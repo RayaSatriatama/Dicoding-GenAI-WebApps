@@ -1,7 +1,5 @@
 .dashboardLayout {
   display: flex;
-  gap: 50px;
-  padding-top: 20px;
   height: 100%;
 
   .menu {
@@ -22,6 +20,28 @@
   height: 40px;
   animation: spin 1s linear infinite;
   margin: 20px auto;
+}
+
+.dashboardLayout .message {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  word-break: break-word;
+  max-width: 90%;
+  align-items: baseline;
+}
+
+.dashboardLayout .message .user {
+  display: flex;
+  align-items: flex-end;
+  gap: 16px;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  word-break: break-word;
+  max-width: 90%;
 }
 
 @keyframes spin {

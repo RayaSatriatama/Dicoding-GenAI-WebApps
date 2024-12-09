@@ -1,28 +1,40 @@
 .rootLayout {
-  padding: 16px 64px;
+  padding: 16px 32px;
   height: 100vh;
   display: flex;
   flex-direction: column;
+}
 
-  header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+.rootLayout header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 16px;
+}
 
-    .logo {
-      display: flex;
-      align-items: center;
-      font-weight: bold;
-      gap: 8px;
+.rootLayout .logo {
+  display: flex;
+  align-items: center;
+  font-weight: bold;
+  gap: 8px;
+}
 
-      img {
-        width: 96px;
-      }
-    }
-  }
+.rootLayout .logo img {
+  width: 96px;
+}
 
-  main {
-    flex: 1;
-    overflow: hidden;
-  }
+.rootLayout .user-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.rootLayout .user {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.rootLayout main {
+  flex: 1;
 }
