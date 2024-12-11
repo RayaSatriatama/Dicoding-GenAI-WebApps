@@ -1,6 +1,7 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { ConfigContext } from "../configStore/ConfigStore";
 import { Settings, Trash2 } from 'lucide-react'
+import { useAuth } from '@clerk/clerk-react';
 
 import { Button } from "@/components/ui/button"
 import {
@@ -38,7 +39,15 @@ const presets = {
     documents: ["None", "General Knowledge", "Code Documentation"]
   },
   "Ollama": {
-    models: ["hf.co/gmonsoon/gemma2-9b-cpt-sahabatai-v1-instruct-GGUF:latest", "hf.co/gmonsoon/llama3-8b-cpt-sahabatai-v1-instruct-GGUF:latest", "hf.co/QuantFactory/komodo-7b-base-GGUF:latest", "llama3-8b-cpt-sahabatai-v1-instruct", "llama3.1:8b-instruct-q4_K_M"],
+    models: [
+      "hf.co/QuantFactory/Llama-3.1-8B-ArliAI-Indo-Formax-v1.0-GGUF:latest",
+      "hf.co/QuantFactory/komodo-7b-base-GGUF:latest",
+      "llama3.1:8b-instruct-q4_K_M",
+      "hf.co/QuantFactory/Llama-3.1-8B-ArliAI-Indo-Formax-v1.0-GGUF:latest",
+      "hf.co/QuantFactory/komodo-7b-base-GGUF:latest",
+      "hf.co/AscendingGrass/Llama-3.2_3B_C242-ET01_GGUF:latest",
+      "llama3.2:latest"
+    ].sort(),
     maxTokens: 4096,
     temperature: 0.7,
     topK: 1,
@@ -50,7 +59,33 @@ const presets = {
 
 export function Sidebar() {
   const { config, setConfig } = useContext(ConfigContext);
+  const { userId } = useAuth();
   const [open, setOpen] = React.useState(false)
+  const [documents, setDocuments] = useState([]);
+
+  useEffect(() => {
+    const fetchDocuments = async () => {
+      try {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/documents`, {
+          method: 'GET',
+          credentials: 'include',
+        });
+
+        if (response.ok) {
+          const allDocuments = await response.json();
+          const userDocuments = allDocuments.filter(doc => doc.userId === userId);
+          setDocuments(userDocuments.map(doc => doc.path));
+          console.log(userDocuments);
+        } else {
+          console.error("Failed to fetch documents");
+        }
+      } catch (error) {
+        console.error("Error fetching documents:", error);
+      }
+    };
+
+    fetchDocuments();
+  }, [userId]);
 
   const handlePlatformChange = (value) => {
     if (!presets[value]) {
@@ -70,7 +105,6 @@ export function Sidebar() {
     });
   }
 
-  // Ensure config.platform is valid before accessing presets
   const platform = config.platform || Object.keys(presets)[0];
 
   return (
@@ -79,7 +113,7 @@ export function Sidebar() {
         <Button
           variant="outline"
           size="icon"
-          className="rounded-full transition-all duration-300 bg-white hover:bg-gray-900 text-gray-900 hover:text-white"
+          className="rounded-full transition-all duration-300 bg-white hover:bg-slate-800 text-slate-800 hover:text-white"
         >
           <Settings className="h-5 w-5" />
           <span className="sr-only">Toggle Sidebar</span>
@@ -94,28 +128,62 @@ export function Sidebar() {
         </SheetHeader>
         <ScrollArea className="h-[calc(100vh-5rem)] pb-10">
           <div className="space-y-8 p-6">
+            <ConfigSection title="Agents">
+              <ConfigItem label="Agent Style">
+                <Select onValueChange={(style) => setConfig({ ...config, agentStyle: style })} value={config.agentStyle}>
+                  <SelectTrigger id="agent-style" className="max-w-[200px] overflow-hidden text-ellipsis whitespace-nowrap w-full">
+                    <SelectValue placeholder="Select agent style" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem key="none" value="none" className="max-w-[200px] overflow-hidden text-ellipsis whitespace-nowrap w-full">none</SelectItem>
+                    {presets[config.platform].agentStyles.map((style) => (
+                      <SelectItem key={style} value={style} className="max-w-[200px] overflow-hidden text-ellipsis whitespace-nowrap w-full">{style}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </ConfigItem>
+            </ConfigSection>
+
+            <ConfigSection title="Document">
+              <ConfigItem label="Document">
+                <Select onValueChange={(doc) => setConfig({ ...config, document: doc })} value={config.document}>
+                  <SelectTrigger id="document" className="max-w-[200px] overflow-hidden text-ellipsis whitespace-nowrap w-full">
+                    <SelectValue placeholder="Select document" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem key="none" value="none" className="max-w-[200px] overflow-hidden text-ellipsis whitespace-nowrap w-full">none</SelectItem>
+                    {documents.map((title) => (
+                      <SelectItem key={title} value={title} className="max-w-[200px] overflow-hidden text-ellipsis whitespace-nowrap w-full">
+                        {title.replace(/^\d+-/, '')}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </ConfigItem>
+            </ConfigSection>
+
             <ConfigSection title="Model">
               <div className="space-y-4">
                 <ConfigItem label="Platform">
                   <Select onValueChange={handlePlatformChange} value={config.platform}>
-                    <SelectTrigger id="platform">
+                    <SelectTrigger id="platform" className="max-w-[200px] overflow-hidden text-ellipsis whitespace-nowrap w-full">
                       <SelectValue placeholder="Select platform" />
                     </SelectTrigger>
                     <SelectContent>
                       {Object.keys(presets).map((key) => (
-                        <SelectItem key={key} value={key}>{key}</SelectItem>
+                        <SelectItem key={key} value={key} className="max-w-[200px] overflow-hidden text-ellipsis whitespace-nowrap w-full">{key}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
                 </ConfigItem>
                 <ConfigItem label="Model">
                   <Select onValueChange={(model) => setConfig({ ...config, model })} value={config.model}>
-                    <SelectTrigger id="model">
+                    <SelectTrigger id="model" className="max-w-[200px] overflow-hidden text-ellipsis whitespace-nowrap w-full">
                       <SelectValue placeholder="Select model" />
                     </SelectTrigger>
                     <SelectContent>
                       {presets[platform].models.sort().map((m) => (
-                        <SelectItem key={m} value={m}>{m}</SelectItem>
+                        <SelectItem key={m} value={m} className="max-w-[200px] overflow-hidden text-ellipsis whitespace-nowrap w-full">{m.replace(/^hf\.co\//, '')}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
@@ -126,7 +194,7 @@ export function Sidebar() {
             <ConfigSection title="Setting">
               <div className="space-y-4">
                 <ConfigItem label="Max Tokens">
-                  <div className="flex items-center space-x-2">
+                  <div className="flex items-center space-x-2 space-between justify-between">
                     <Input
                       type="number"
                       value={config.maxTokens}
@@ -219,35 +287,6 @@ export function Sidebar() {
               </div>
             </ConfigSection>
 
-            <ConfigSection title="Agents">
-              <ConfigItem label="Agent Style">
-                <Select onValueChange={(style) => setConfig({ ...config, agentStyle: style })} value={config.agentStyle}>
-                  <SelectTrigger id="agent-style">
-                    <SelectValue placeholder="Select agent style" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {presets[config.platform].agentStyles.map((style) => (
-                      <SelectItem key={style} value={style}>{style}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </ConfigItem>
-            </ConfigSection>
-
-            <ConfigSection title="Document">
-              <ConfigItem label="Document">
-                <Select onValueChange={(doc) => setConfig({ ...config, document: doc })} value={config.document}>
-                  <SelectTrigger id="document">
-                    <SelectValue placeholder="Select document" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {presets[config.platform].documents.map((doc) => (
-                      <SelectItem key={doc} value={doc}>{doc}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </ConfigItem>
-            </ConfigSection>
           </div>
         </ScrollArea>
       </SheetContent>

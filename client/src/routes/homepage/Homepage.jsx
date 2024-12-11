@@ -16,7 +16,7 @@ const Homepage = () => {
           Lorem ipsum dolor sit, amet consectetur adipisicing elit. Placeat sint
           dolorem doloribus, architecto dolor.
         </h3>
-        <Link to="/dashboard">Get Started</Link>
+        <Link to="/dashboard"><p className="get-started">Get Started</p></Link>
       </div>
       <div className="right">
         <div className="imgContainer">
@@ -37,23 +37,22 @@ const Homepage = () => {
             />
             <TypeAnimation
               sequence={[
-                // Same substring at the start will only be typed out once, initially
-                "Human:We produce food for Mice",
+                "Pengguna: Apa itu teknologi AI dan bagaimana cara kerjanya?",
                 2000,
                 () => {
                   setTypingStatus("bot");
                 },
-                "Bot:We produce food for Hamsters",
+                "Agent: Teknologi AI adalah kecerdasan buatan yang memungkinkan mesin untuk belajar dan membuat keputusan secara otomatis.",
                 2000,
                 () => {
                   setTypingStatus("human2");
                 },
-                "Human2:We produce food for Guinea Pigs",
+                "Pengguna2: Apa saja contoh penerapan AI dalam kehidupan sehari-hari?",
                 2000,
                 () => {
                   setTypingStatus("bot");
                 },
-                "Bot:We produce food for Chinchillas",
+                "Agent: Beberapa contoh penerapan AI adalah asisten virtual seperti Siri dan Google Assistant, serta sistem rekomendasi di platform seperti Netflix dan YouTube.",
                 2000,
                 () => {
                   setTypingStatus("human1");
@@ -67,14 +66,14 @@ const Homepage = () => {
           </div>
         </div>
       </div>
-      <div className="terms">
-        {/* <img src="/logo.png" alt="" /> */}
+      {/* <div className="terms">
+        <img src="/logo.png" alt="" />
         <div className="links">
           <Link to="/">Terms of Service</Link>
           <span>|</span>
           <Link to="/">Privacy Policy</Link>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 };
