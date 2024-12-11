@@ -12,7 +12,7 @@ export const ConfigProvider = ({ children }) => {
     topK: 40,
     topP: 0.95,
     agentStyle: 'generate-question',
-    document: 'defaultDocument',
+    document: 'none',
   });
 
   return (

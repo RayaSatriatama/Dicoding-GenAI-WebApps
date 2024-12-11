@@ -35,7 +35,6 @@ const ChatList = () => {
         navigate("/dashboard");
       }
 
-      // alert("Chat deleted successfully!");
       refetch();
     } catch (error) {
       console.error(error);
@@ -51,14 +50,12 @@ const ChatList = () => {
           Buat Chat Baru
         </div>
       </Link>
-      <Link to="/">
-        <div className="link-container">
-          Jelajahi
-        </div>
+      <Link to="/upload">
+        <div className="link-container">Upload File</div>
       </Link>
       <Link to="/">
         <div className="link-container">
-          Hubungi Kami
+          Jelajahi
         </div>
       </Link>
       <hr />

@@ -1,7 +1,6 @@
 .homepage {
   display: flex;
   align-items: center;
-  gap: 100px;
   height: 100%;
 
   @media screen and (max-width: 1024px) {
@@ -24,11 +23,17 @@
       background-clip: text;
       -webkit-background-clip: text;
       color: transparent;
+      font-weight: 700;
 
       @media screen and (max-width: 1280px) {
         font-size: 64px;
       }
     }
+
+    h2 {
+      font-weight: 600;
+    }
+
     h3 {
       font-weight: 400;
       max-width: 70%;
@@ -51,6 +56,11 @@
       }
     }
   }
+
+  .get-started {
+    font-weight: 700;
+  }
+
   .right {
     flex: 1;
     display: flex;
@@ -97,14 +107,16 @@
       .chat {
         position: absolute;
         bottom: -30px;
-        right: -50px;
+        left: 0px;
         display: flex;
-        align-items: center;
+        align-items: flex-start;
         gap: 10px;
-        padding: 20px;
+        padding: 15px;
         background-color: white;
         border-radius: 10px;
-
+        flex-direction: row;
+        justify-content: flex-start;
+        width: auto;
         @media screen and (max-width: 1024px) {
           display: none;
         }

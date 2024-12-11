@@ -1,9 +1,8 @@
 /* src/components/chatList.css */
-.chatList {
+.uploadPage {
   display: flex;
   flex-direction: column;
   height: 100%;
-  width: 15.625vw;
 
   hr {
     border: none;
@@ -14,15 +13,9 @@
     margin: 20px 0px;
   }
 
-  .title {
-    font-weight: bolder;
-    font-size: 16px;
-    margin-bottom: 16px;
-  }
-
-  .chat-scroll-area {
+  .upload-scroll-area {
     flex: 1;
-    max-height: 48vh;
+    max-height: 60vh;
     overflow-y: auto;
     padding-right: 10px;
     box-sizing: content-box;
@@ -93,28 +86,28 @@
     }
   }
 
-  .chat-scroll-area::-webkit-scrollbar {
+  .upload-scroll-area::-webkit-scrollbar {
     width: 12px;
   }
 
-  .chat-scroll-area::-webkit-scrollbar-track {
-    background-color: #f1f1f1;
+  .upload-scroll-area::-webkit-scrollbar-track {
+    background-color: #2d3e50;
     border-radius: 6px;
   }
 
-  .chat-scroll-area::-webkit-scrollbar-thumb {
-    background-color: #888;
+  .upload-scroll-area::-webkit-scrollbar-thumb {
+    background-color: #2d3e50;
     border-radius: 6px;
     border: 3px solid #f1f1f1;
   }
 
-  .chat-scroll-area::-webkit-scrollbar-thumb:hover {
-    background-color: #555;
+  .upload-scroll-area::-webkit-scrollbar-thumb:hover {
+    background-color: #2d3e50;
   }
 
-  .chat-scroll-area {
+  .upload-scroll-area {
     scrollbar-width: thin;
-    scrollbar-color: #888 #f1f1f1;
+    scrollbar-color: #2d3e50 #f1f1f1;
   }
 }
 
@@ -133,75 +126,3 @@
   100% { transform: rotate(360deg); }
 }
 
-.chat-title {
-  flex: 1;
-  width: 11.458vw;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  display: inline-block;
-}
-
-.delete-button {
-  margin-top: auto;
-  margin-bottom: auto;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  transition: transform 0.2s ease, opacity 0.2s ease;
-  width: 30px;
-  height: 30px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0;
-  position: relative;
-  right: 0;
-  left: 0px;
-  color: white;
-  opacity: 0;
-
-  &:hover {
-    transform: scale(1.1);
-  }
-
-  &:active {
-    transform: scale(0.9);
-  }
-
-  svg {
-    fill: currentColor;
-  }
-}
-
-@media (max-width: 768px) {
-  .link-container {
-    padding: 8px;
-  }
-
-  .chat-title {
-    max-width: 60%;
-  }
-}
-
-@media (max-width: 480px) {
-  .link-container {
-    padding: 6px;
-  }
-
-  .chat-title {
-    max-width: 50%;
-  }
-}
-
-@media (max-height: 768px) {
-  .chat-scroll-area {
-    max-height: 28vh;
-  }
-}
-
-@media (max-height: 576px) {
-  .chat-scroll-area {
-    max-height: 23vh;
-  }
-}

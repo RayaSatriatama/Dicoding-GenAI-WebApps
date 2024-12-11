@@ -51,7 +51,6 @@ const NewPrompt = ({ data }) => {
       }).then((res) => res.json());
     },
     onSuccess: () => {
-      console.log("Mutation Success:", data);
       queryClient.invalidateQueries({ queryKey: ["chat", data._id] })
         .then(() => {
           formRef.current.reset();
@@ -160,9 +159,26 @@ const NewPrompt = ({ data }) => {
         return;
       }
 
+      let nonSearch = false;
+      if (config.model == "hf.co/QuantFactory/Llama-3.1-8B-ArliAI-Indo-Formax-v1.0-GGUF:latest" ||
+        config.model == "hf.co/QuantFactory/komodo-7b-base-GGUF:latest" ||
+        config.model == "hf.co/QuantFactory/Llama-3.1-8B-ArliAI-Indo-Formax-v1.0-GGUF:latest" ||
+        config.model == "hf.co/QuantFactory/komodo-7b-base-GGUF:latest") {
+        nonSearch = true;
+      }
+
+      let urlEndpoint;
+      if (config.agentStyle != "none") {
+        urlEndpoint = import.meta.env.VITE_POST_URL_AGENT + "/" + config.agentStyle + "/" + config.platform.toLowerCase();
+      } else if (nonSearch) {
+        urlEndpoint = import.meta.env.VITE_POST_URL_AGENT + "/" + config.agentStyle + "/" + config.platform.toLowerCase() + "/nonsearch";
+      } else {
+        urlEndpoint = import.meta.env.VITE_POST_URL_AGENT + "/none/" + config.platform.toLowerCase();
+      }
+
       // const response = await fetch("http://localhost:5678/webhook-test/agent/chat-forum/gemini", {
 
-      const response = await fetch(`${import.meta.env.VITE_POST_URL_AGENT}/${config.agentStyle}/${config.platform.toLowerCase()}`, {
+      const response = await fetch(urlEndpoint, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -194,8 +210,6 @@ const NewPrompt = ({ data }) => {
         setAnswer("Maaf, tidak ada output yang valid yang diterima.");
         return;
       }
-
-      console.log(output);
 
       await mutation.mutate({
         question: question,

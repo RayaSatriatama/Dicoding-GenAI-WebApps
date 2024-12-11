@@ -7,6 +7,12 @@ export default {
   ],
   theme: {
   	extend: {
+			colors: {
+        gray: {
+          300: '#ECECEC',
+        },
+        customColor: '#ECECEC',
+      },
   		borderRadius: {
   			lg: 'var(--radius)',
   			md: 'calc(var(--radius) - 2px)',
