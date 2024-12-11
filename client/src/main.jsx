@@ -9,7 +9,7 @@ import RootLayout from './layouts/rootLayout/RootLayout';
 import DashboardLayout from './layouts/dashboardLayout/DashboardLayout';
 import SignInPage from './routes/signInPage/SignInPage';
 import SignUpPage from './routes/signUpPage/SignUpPage';
-import UploadPage from './routes/uploadPage/uploadPage';
+import UploadPage from './routes/uploadPage/UploadPage';
 import UploadLayout from './layouts/uploadLayout/UploadLayout';
 
 const router = createBrowserRouter([
