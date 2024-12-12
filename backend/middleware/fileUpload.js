@@ -2,15 +2,13 @@ import fs from 'fs';
 import path from 'path';
 import multer from 'multer';
 
-const uploadDir = path.join('D:', 'Projects', 'Programming_Projects', 'Dicoding-Gen-AI', 'self-hosted-ai-starter-kit', 'shared', 'document');
-
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true });
+if (!fs.existsSync(process.env.UPLOAD_DIR)) {
+  fs.mkdirSync(process.env.UPLOAD_DIR, { recursive: true });
 }
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, uploadDir);
+    cb(null, process.env.UPLOAD_DIR);
   },
   filename: function (req, file, cb) {
     const uniqueSuffix = Date.now() + '-' + file.originalname;

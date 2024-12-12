@@ -44,7 +44,8 @@ const presets = {
       "hf.co/QuantFactory/komodo-7b-base-GGUF:latest",
       "llama3.1:8b-instruct-q4_K_M",
       "hf.co/AscendingGrass/Llama-3.1_8B_C242-ET01_GGUF:latest",
-      "llama3.2:latest"
+      "llama3.2:latest",
+      "hf.co/gmonsoon/llama3-8b-cpt-sahabatai-v1-instruct-GGUF"
     ].sort(),
     maxTokens: 4096,
     temperature: 0.7,
