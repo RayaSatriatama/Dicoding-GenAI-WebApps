@@ -40,12 +40,10 @@ const presets = {
   },
   "Ollama": {
     models: [
-      "hf.co/QuantFactory/Llama-3.1-8B-ArliAI-Indo-Formax-v1.0-GGUF:latest",
+      "hf.co/AscendingGrass/Llama-3.2_3B_C242-ET01_GGUF",
       "hf.co/QuantFactory/komodo-7b-base-GGUF:latest",
       "llama3.1:8b-instruct-q4_K_M",
-      "hf.co/QuantFactory/Llama-3.1-8B-ArliAI-Indo-Formax-v1.0-GGUF:latest",
-      "hf.co/QuantFactory/komodo-7b-base-GGUF:latest",
-      "hf.co/AscendingGrass/Llama-3.2_3B_C242-ET01_GGUF:latest",
+      "hf.co/AscendingGrass/Llama-3.1_8B_C242-ET01_GGUF:latest",
       "llama3.2:latest"
     ].sort(),
     maxTokens: 4096,

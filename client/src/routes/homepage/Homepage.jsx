@@ -11,11 +11,7 @@ const Homepage = () => {
       <img src="/orbital.png" alt="" className="orbital" />
       <div className="left">
         <h1>Dicoding Generative AI</h1>
-        <h2>Supercharge your creativity and productivity</h2>
-        <h3>
-          Lorem ipsum dolor sit, amet consectetur adipisicing elit. Placeat sint
-          dolorem doloribus, architecto dolor.
-        </h3>
+        <h2>AI for Education, Education for All</h2>
         <Link to="/dashboard"><p className="get-started">Get Started</p></Link>
       </div>
       <div className="right">

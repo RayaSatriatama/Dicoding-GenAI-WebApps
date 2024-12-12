@@ -108,7 +108,7 @@ export default function UploadPage() {
         const result = await response.json();
         const newFile = {
           name: result.fileName,
-          path: result.filePath.replace(/^uploads\//, ''),
+          path: result.filePath.replace(/^uploads\//, '').replace(import.meta.env.VITE_UPLOAD_DIR, ''),
           size: file.size,
           type: file.type,
           uploadDate: new Date().toISOString(),
