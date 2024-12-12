@@ -2,7 +2,7 @@
 
 ## Executive Summary
 
-![Dicoding-GenAI-Webapps](./src/image.png)
+![Dicoding-GenAI-Webapps](./src/Screenshot%202024-12-12%20170656.png)
 
 Indonesia’s educational technology sector faces significant challenges in leveraging Generative AI, particularly with Large Language Models (LLMs) like Google's Gemini for Bahasa Indonesia on Google Cloud. This project addresses these challenges by building a Generative AI system tailored for Dicoding, enabling automated, curriculum-aligned content generation and improving contextual accuracy in forums and chats.
 
@@ -12,7 +12,7 @@ Our solution integrates LLM with a MERN (MongoDB, Express, React, Node.js) web a
 
 ## Features
 
-![Dicoding-GenAI-Webapps](./src/Screenshot%202024-12-12%20170656.png)
+![Dicoding-GenAI-Webapps](./src/image.png)
 
 - **Content Generation**: Automates the creation of curriculum-aligned content, reducing manual workload.
 - **Improved Bahasa Indonesia Accuracy**: Fine-tuned responses for forums and chat support.
