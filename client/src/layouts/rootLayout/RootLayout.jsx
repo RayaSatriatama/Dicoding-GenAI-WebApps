@@ -2,7 +2,7 @@ import { Link, Outlet } from "react-router-dom";
 import "./rootLayout.css";
 import { ClerkProvider, SignedIn, UserButton } from "@clerk/clerk-react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Sidebar } from "../../components/sidebar/sidebar";
+import { Sidebar } from "../../components/sidebar/Sidebar";
 import { ConfigProvider } from '../../components/configStore/ConfigStore';
 const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 
@@ -25,8 +25,8 @@ const RootLayout = () => {
               <div className="user">
                 <SignedIn>
                   <UserButton />
+                  <Sidebar />
                 </SignedIn>
-                <Sidebar />
               </div>
             </header>
             <main>
