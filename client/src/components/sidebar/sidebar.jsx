@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import { ConfigContext } from "../configStore/ConfigStore";
-import { Settings, Trash2 } from 'lucide-react'
+import { Settings, RotateCcw, Cpu, FileText, Sliders, Gauge, Bot, Database } from 'lucide-react'
 import { useAuth } from '@clerk/clerk-react';
 
 import { Button } from "@/components/ui/button"
@@ -112,7 +112,7 @@ export function Sidebar() {
         <Button
           variant="outline"
           size="icon"
-          className="rounded-full transition-all duration-300 bg-white hover:bg-slate-800 text-slate-800 hover:text-white"
+          className="rounded-full transition-all duration-300 bg-white hover:bg-primary text-slate-600 hover:text-white border-slate-200 hover:border-primary shadow-sm"
         >
           <Settings className="h-5 w-5" />
           <span className="sr-only">Toggle Sidebar</span>
@@ -120,69 +120,39 @@ export function Sidebar() {
       </SheetTrigger>
       <SheetContent
         side="right"
-        className="w-[300px] sm:w-[400px] overflow-y-auto bg-background/80 backdrop-blur-md border-l border-primary/20 shadow-xl transition-all duration-300"
+        className="w-[320px] sm:w-[400px] overflow-y-auto bg-white border-l border-slate-200 shadow-2xl"
       >
-        <SheetHeader>
-          <SheetTitle className="text-2xl font-bold text-primary">Configuration</SheetTitle>
+        <SheetHeader className="pb-4 border-b border-slate-100">
+          <SheetTitle className="text-lg font-heading font-bold text-slate-900 flex items-center gap-2">
+            <Settings className="w-5 h-5 text-primary" />
+            Konfigurasi AI
+          </SheetTitle>
         </SheetHeader>
-        <ScrollArea className="h-[calc(100vh-5rem)] pb-10">
-          <div className="space-y-8 p-6">
-            <ConfigSection title="Agents">
-              <ConfigItem label="Agent Style">
-                <Select onValueChange={(style) => setConfig({ ...config, agentStyle: style })} value={config.agentStyle}>
-                  <SelectTrigger id="agent-style" className="max-w-[200px] overflow-hidden text-ellipsis whitespace-nowrap w-full">
-                    <SelectValue placeholder="Select agent style" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem key="none" value="none" className="max-w-[200px] overflow-hidden text-ellipsis whitespace-nowrap w-full">none</SelectItem>
-                    {presets[config.platform].agentStyles.map((style) => (
-                      <SelectItem key={style} value={style} className="max-w-[200px] overflow-hidden text-ellipsis whitespace-nowrap w-full">{style}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </ConfigItem>
-            </ConfigSection>
-
-            <ConfigSection title="Document">
-              <ConfigItem label="Document">
-                <Select onValueChange={(doc) => setConfig({ ...config, document: doc })} value={config.document}>
-                  <SelectTrigger id="document" className="max-w-[200px] overflow-hidden text-ellipsis whitespace-nowrap w-full">
-                    <SelectValue placeholder="Select document" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem key="none" value="none" className="max-w-[200px] overflow-hidden text-ellipsis whitespace-nowrap w-full">none</SelectItem>
-                    {documents.map((title) => (
-                      <SelectItem key={title} value={title} className="max-w-[200px] overflow-hidden text-ellipsis whitespace-nowrap w-full">
-                        {title.replace(/^\d+-/, '')}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </ConfigItem>
-            </ConfigSection>
-
-            <ConfigSection title="Model">
-              <div className="space-y-4">
+        <ScrollArea className="h-[calc(100vh-5rem)] pb-8">
+          <div className="space-y-4 py-4">
+            {/* Model & Platform Section */}
+            <ConfigSection title="Model" icon={<Cpu className="w-4 h-4" />}>
+              <div className="space-y-3">
                 <ConfigItem label="Platform">
                   <Select onValueChange={handlePlatformChange} value={config.platform}>
-                    <SelectTrigger id="platform" className="max-w-[200px] overflow-hidden text-ellipsis whitespace-nowrap w-full">
+                    <SelectTrigger id="platform" className="w-full h-9">
                       <SelectValue placeholder="Select platform" />
                     </SelectTrigger>
                     <SelectContent>
                       {Object.keys(presets).map((key) => (
-                        <SelectItem key={key} value={key} className="max-w-[200px] overflow-hidden text-ellipsis whitespace-nowrap w-full">{key}</SelectItem>
+                        <SelectItem key={key} value={key}>{key}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
                 </ConfigItem>
                 <ConfigItem label="Model">
                   <Select onValueChange={(model) => setConfig({ ...config, model })} value={config.model}>
-                    <SelectTrigger id="model" className="max-w-[200px] overflow-hidden text-ellipsis whitespace-nowrap w-full">
+                    <SelectTrigger id="model" className="w-full h-9">
                       <SelectValue placeholder="Select model" />
                     </SelectTrigger>
                     <SelectContent>
                       {presets[platform].models.sort().map((m) => (
-                        <SelectItem key={m} value={m} className="max-w-[200px] overflow-hidden text-ellipsis whitespace-nowrap w-full">{m.replace(/^hf\.co\//, '')}</SelectItem>
+                        <SelectItem key={m} value={m}>{m.replace(/^hf\.co\//, '')}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
@@ -190,29 +160,81 @@ export function Sidebar() {
               </div>
             </ConfigSection>
 
-            <ConfigSection title="Setting">
+            {/* Context Section - Combines Agents & Document */}
+            <ConfigSection title="Context" icon={<Database className="w-4 h-4" />}>
+              <div className="space-y-3">
+                <ConfigItem label="Agent Style">
+                  <Select onValueChange={(style) => setConfig({ ...config, agentStyle: style })} value={config.agentStyle}>
+                    <SelectTrigger id="agent-style" className="w-full h-9">
+                      <SelectValue placeholder="Select agent style" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem key="none" value="none">none</SelectItem>
+                      {presets[config.platform].agentStyles.map((style) => (
+                        <SelectItem key={style} value={style}>{style}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </ConfigItem>
+                <ConfigItem label="Document">
+                  <Select onValueChange={(doc) => setConfig({ ...config, document: doc })} value={config.document}>
+                    <SelectTrigger id="document" className="w-full h-9">
+                      <SelectValue placeholder="Select document" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem key="none" value="none">none</SelectItem>
+                      {documents.map((title) => (
+                        <SelectItem key={title} value={title}>
+                          {title.replace(/^\d+-/, '')}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </ConfigItem>
+              </div>
+            </ConfigSection>
+
+            {/* Generation Settings Section */}
+            <ConfigSection title="Generation" icon={<Sliders className="w-4 h-4" />}>
               <div className="space-y-4">
-                <ConfigItem label="Max Tokens">
-                  <div className="flex items-center space-x-2 space-between justify-between">
+                <ConfigItem label={
+                  <div className="flex items-center justify-between w-full">
+                    <span>Max Tokens</span>
+                    <div className="flex items-center gap-1.5">
+                      <Switch
+                        checked={config.unlimitedTokens}
+                        onCheckedChange={(value) => setConfig({ ...config, unlimitedTokens: value })}
+                        className="scale-75"
+                      />
+                      <span className="text-xs text-muted-foreground">Unlimited</span>
+                    </div>
+                  </div>
+                }>
+                  <div className="flex items-center gap-2">
+                    <Slider
+                      id="maxTokens"
+                      min={128}
+                      max={16384}
+                      step={128}
+                      value={[config.maxTokens]}
+                      onValueChange={(value) => setConfig({ ...config, maxTokens: value[0] })}
+                      disabled={config.unlimitedTokens}
+                      className="flex-1"
+                    />
                     <Input
                       type="number"
                       value={config.maxTokens}
-                      onChange={(e) => setConfig({ ...config, maxTokens: parseInt(e.target.value) })}
-                      min={0}
-                      max={9999}
+                      onChange={(e) => setConfig({ ...config, maxTokens: Math.min(16384, Math.max(128, parseInt(e.target.value) || 128)) })}
+                      min={128}
+                      max={16384}
                       disabled={config.unlimitedTokens}
-                      className="w-24"
+                      className="w-20 h-9"
                     />
-                    <Switch
-                      checked={config.unlimitedTokens}
-                      onCheckedChange={(value) => setConfig({ ...config, unlimitedTokens: value })}
-                    />
-                    <Label htmlFor="unlimited-tokens" className="text-sm">Unlimited</Label>
                     <ResetButton onClick={() => setConfig({ ...config, maxTokens: presets[config.platform].maxTokens })} />
                   </div>
                 </ConfigItem>
                 <ConfigItem label="Temperature">
-                  <div className="flex items-center space-x-2">
+                  <div className="flex items-center gap-2">
                     <Slider
                       id="temperature"
                       min={0}
@@ -220,7 +242,7 @@ export function Sidebar() {
                       step={0.01}
                       value={[config.temperature]}
                       onValueChange={(value) => setConfig({ ...config, temperature: value[0] })}
-                      className="w-[60%]"
+                      className="flex-1"
                     />
                     <Input
                       type="number"
@@ -229,7 +251,7 @@ export function Sidebar() {
                       min={0}
                       max={1}
                       step={0.01}
-                      className="w-20"
+                      className="w-16 h-9"
                     />
                     <ResetButton onClick={() => setConfig({ ...config, temperature: presets[config.platform].temperature })} />
                   </div>
@@ -237,17 +259,18 @@ export function Sidebar() {
               </div>
             </ConfigSection>
 
-            <ConfigSection title="Sampling">
+            {/* Sampling Section */}
+            <ConfigSection title="Sampling" icon={<Gauge className="w-4 h-4" />}>
               <div className="space-y-4">
                 <ConfigItem label="Top-K">
-                  <div className="flex items-center space-x-2">
+                  <div className="flex items-center gap-2">
                     <Slider
                       id="top-k"
                       min={0}
                       max={100}
                       value={[config.topK]}
                       onValueChange={(value) => setConfig({ ...config, topK: value[0] })}
-                      className="w-[60%]"
+                      className="flex-1"
                     />
                     <Input
                       type="number"
@@ -255,13 +278,13 @@ export function Sidebar() {
                       onChange={(e) => setConfig({ ...config, topK: parseInt(e.target.value) })}
                       min={0}
                       max={100}
-                      className="w-20"
+                      className="w-16 h-9"
                     />
                     <ResetButton onClick={() => setConfig({ ...config, topK: presets[config.platform].topK })} />
                   </div>
                 </ConfigItem>
                 <ConfigItem label="Top-P">
-                  <div className="flex items-center space-x-2">
+                  <div className="flex items-center gap-2">
                     <Slider
                       id="top-p"
                       min={0}
@@ -269,7 +292,7 @@ export function Sidebar() {
                       step={0.01}
                       value={[config.topP]}
                       onValueChange={(value) => setConfig({ ...config, topP: value[0] })}
-                      className="w-[60%]"
+                      className="flex-1"
                     />
                     <Input
                       type="number"
@@ -278,7 +301,7 @@ export function Sidebar() {
                       min={0}
                       max={1}
                       step={0.01}
-                      className="w-20"
+                      className="w-16 h-9"
                     />
                     <ResetButton onClick={() => setConfig({ ...config, topP: presets[config.platform].topP })} />
                   </div>
@@ -293,10 +316,13 @@ export function Sidebar() {
   )
 }
 
-function ConfigSection({ title, children }) {
+function ConfigSection({ title, icon, children }) {
   return (
-    <div className="space-y-4">
-      <h3 className="text-lg font-semibold text-primary">{title}</h3>
+    <div className="space-y-3 p-3.5 bg-slate-50/80 rounded-lg border border-slate-100">
+      <h3 className="text-xs font-semibold text-slate-700 uppercase tracking-wide flex items-center gap-1.5">
+        <span className="text-primary">{icon}</span>
+        {title}
+      </h3>
       {children}
     </div>
   )
@@ -304,8 +330,8 @@ function ConfigSection({ title, children }) {
 
 function ConfigItem({ label, children }) {
   return (
-    <div className="space-y-2">
-      <Label className="text-sm font-medium text-muted-foreground">{label}</Label>
+    <div className="space-y-1.5">
+      <Label className="text-[11px] font-medium text-slate-500 uppercase tracking-wider">{label}</Label>
       {children}
     </div>
   )
@@ -314,12 +340,13 @@ function ConfigItem({ label, children }) {
 function ResetButton({ onClick }) {
   return (
     <Button
-      variant="outline"
+      variant="ghost"
       size="icon"
       onClick={onClick}
-      className="h-8 w-8 rounded-full bg-white hover:bg-gray-900 text-gray-900 hover:text-white transition-colors duration-200"
+      className="h-7 w-7 rounded-md hover:bg-slate-200 text-slate-400 hover:text-slate-600 transition-colors duration-150 flex-shrink-0"
+      title="Reset to default"
     >
-      <Trash2 className="h-4 w-4" />
+      <RotateCcw className="h-3.5 w-3.5" />
     </Button>
   )
 }

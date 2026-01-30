@@ -2,10 +2,10 @@ import { useEffect, useRef, useState, useContext } from "react";
 import "./newPrompt.css";
 import Upload from "../upload/Upload";
 import { IKImage } from "imagekitio-react";
-import Markdown from "react-markdown";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import TypingAnimation from '../../style/TypingAnimation';
 import { ConfigContext } from "../../components/configStore/ConfigStore";
+import { Send, Paperclip, Bot, User } from "lucide-react";
 
 const speed = 2;
 
@@ -79,64 +79,77 @@ const NewPrompt = ({ data }) => {
   };
 
   const renderQuestionForm = (questions) => {
-    return questions.map((question) => {
+    return questions.map((question, index) => {
       switch (question.type) {
         case "multiple_choice":
           return (
-            <div key={question.id}>
-              <TypingAnimation text={`Pertanyaan: ${question.question}`} speed={speed} />
-              {question.options.map((option) => (
-                <div key={option.id} style={{ display: 'flex', alignItems: 'center' }}>
-                  <input type="radio" id={option.id} name={question.id} />
-                  <label htmlFor={option.id} style={{ marginLeft: '8px' }}>
-                    <TypingAnimation text={option.text} speed={speed} />
+            <div key={question.id} className="question-card-inline">
+              <div className="question-header-inline">
+                <span className="question-number-inline">Soal {index + 1}</span>
+              </div>
+              <p className="question-text-inline">{question.question}</p>
+              <div className="options-list-inline">
+                {question.options.map((option) => (
+                  <label key={option.id} className="option-item-inline">
+                    <input type="radio" name={question.id} />
+                    <span>{option.text}</span>
                   </label>
-                </div>
-              ))}
-              <br />
-              <TypingAnimation text={`Jawaban: ${String(question.correct_answer)}`} speed={speed} />
-              <TypingAnimation text={`Penjelasan: ${question.explanation}`} speed={speed} />
-              <br />
+                ))}
+              </div>
+              <div className="answer-inline">
+                <strong>Jawaban:</strong> {String(question.correct_answer)}
+              </div>
+              <div className="explanation-inline">
+                <strong>Penjelasan:</strong> {question.explanation}
+              </div>
             </div>
           );
         case "multibox":
           return (
-            <div key={question.id}>
-              <TypingAnimation text={`Pertanyaan: ${question.question}`} speed={speed} />
-              {question.options.map((option) => (
-                <div key={option.id} style={{ display: 'flex', alignItems: 'center' }}>
-                  <input type="checkbox" id={option.id} name={question.id} />
-                  <label htmlFor={option.id} style={{ marginLeft: '8px' }}>
-                    <TypingAnimation text={option.text} speed={speed} />
+            <div key={question.id} className="question-card-inline">
+              <div className="question-header-inline">
+                <span className="question-number-inline">Soal {index + 1}</span>
+              </div>
+              <p className="question-text-inline">{question.question}</p>
+              <div className="options-list-inline">
+                {question.options.map((option) => (
+                  <label key={option.id} className="option-item-inline">
+                    <input type="checkbox" name={question.id} />
+                    <span>{option.text}</span>
                   </label>
-                </div>
-              ))}
-              <br />
-              <TypingAnimation text={`Jawaban: ${String(question.correct_answer)}`} speed={speed} />
-              <TypingAnimation text={`Penjelasan: ${question.explanation}`} speed={speed} />
-              <br />
+                ))}
+              </div>
+              <div className="answer-inline">
+                <strong>Jawaban:</strong> {String(question.correct_answer)}
+              </div>
+              <div className="explanation-inline">
+                <strong>Penjelasan:</strong> {question.explanation}
+              </div>
             </div>
           );
         case "true_false":
           return (
-            <div key={question.id}>
-              <TypingAnimation text={`Pertanyaan: ${question.question}`} speed={speed} />
-              <div style={{ display: 'flex', alignItems: 'center' }}>
-                <input type="radio" id={`true-${question.id}`} name={question.id} />
-                <label htmlFor={`true-${question.id}`} style={{ marginLeft: '8px' }}>
-                  <TypingAnimation text="True" speed={speed} />
+            <div key={question.id} className="question-card-inline">
+              <div className="question-header-inline">
+                <span className="question-number-inline">Soal {index + 1}</span>
+              </div>
+              <p className="question-text-inline">{question.question}</p>
+              <div className="options-list-inline tf">
+                <label className="option-item-inline">
+                  <input type="radio" name={question.id} />
+                  <span>Benar</span>
+                </label>
+                <label className="option-item-inline">
+                  <input type="radio" name={question.id} />
+                  <span>Salah</span>
                 </label>
               </div>
-              <div style={{ display: 'flex', alignItems: 'center' }}>
-                <input type="radio" id={`false-${question.id}`} name={question.id} />
-                <label htmlFor={`false-${question.id}`} style={{ marginLeft: '8px' }}>
-                  <TypingAnimation text="False" speed={speed} />
-                </label>
+              <div className="answer-inline">
+                <strong>Jawaban:</strong> {String(question.correct_answer)}
               </div>
-              <br />
-              <TypingAnimation text={`Jawaban: ${String(question.correct_answer)}`} speed={speed} />
-              <TypingAnimation text={`Penjelasan: ${question.explanation}`} speed={speed} />
-              <br />
+              <div className="explanation-inline">
+                <strong>Penjelasan:</strong> {question.explanation}
+              </div>
             </div>
           );
         default:
@@ -175,8 +188,6 @@ const NewPrompt = ({ data }) => {
       } else {
         urlEndpoint = import.meta.env.VITE_POST_URL_AGENT + "/none/" + config.platform.toLowerCase();
       }
-
-      // const response = await fetch("http://localhost:5678/webhook-test/agent/chat-forum/gemini", {
 
       const response = await fetch(urlEndpoint, {
         method: "POST",
@@ -250,56 +261,103 @@ const NewPrompt = ({ data }) => {
 
   return (
     <>
-      {/* ADD NEW CHAT */}
-      {img.isLoading && <div className="">Loading...</div>}
-      {img.dbData?.filePath && (
-        <IKImage
-          urlEndpoint={import.meta.env.VITE_IMAGE_KIT_ENDPOINT}
-          path={img.dbData?.filePath}
-          width="380"
-          transformation={[{ width: 380 }]}
-        />
-      )}
-      {question && (
-        <div className="message user">
-          {isValidJSON(question) ? (
-            renderQuestionForm(JSON.parse(question).questions)
-          ) : (
-            question
-          )}
+      {/* Image preview */}
+      {img.isLoading && (
+        <div className="image-loading">
+          <div className="loading-spinner-small"></div>
+          <span>Mengupload gambar...</span>
         </div>
       )}
+      {img.dbData?.filePath && (
+        <div className="image-preview">
+          <IKImage
+            urlEndpoint={import.meta.env.VITE_IMAGE_KIT_ENDPOINT}
+            path={img.dbData?.filePath}
+            width="380"
+            transformation={[{ width: 380 }]}
+            className="preview-image"
+          />
+        </div>
+      )}
+
+      {/* User question */}
+      {question && (
+        <div className="message-bubble user new-message">
+          <div className="message-avatar user-avatar">
+            <User className="w-5 h-5" />
+          </div>
+          <div className="message-content">
+            <div className="message-text">
+              {isValidJSON(question) ? (
+                <div className="questions-inline">
+                  {renderQuestionForm(JSON.parse(question).questions)}
+                </div>
+              ) : (
+                question
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* AI Response */}
       {loadingAnswer ? (
-        <div className="loading-container">
-          <div className="loading-spinner"></div>
-          <TypingAnimation text="AI sedang berpikir..." speed={speed} />
+        <div className="ai-thinking">
+          <div className="thinking-avatar">
+            <Bot className="w-5 h-5" />
+          </div>
+          <div className="thinking-content">
+            <div className="thinking-dots">
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+            <span className="thinking-text">AI sedang berpikir...</span>
+          </div>
         </div>
       ) : answer && (
-        <div className="message">
-          {isValidJSON(answer) ? (
-            renderQuestionForm(JSON.parse(answer).questions)
-          ) : (
-            <TypingAnimation text={answer} speed={speed} />
-          )}
+        <div className="message-bubble assistant new-message">
+          <div className="message-avatar">
+            <Bot className="w-5 h-5" />
+          </div>
+          <div className="message-content">
+            <div className="message-text">
+              {isValidJSON(answer) ? (
+                <div className="questions-inline">
+                  {renderQuestionForm(JSON.parse(answer).questions)}
+                </div>
+              ) : (
+                <TypingAnimation text={answer} speed={speed} />
+              )}
+            </div>
+          </div>
         </div>
       )}
+
       <div className="endChat" ref={endRef}></div>
-      <form className="newForm" onSubmit={handleSubmit} ref={formRef}>
-        <Upload setImg={setImg} />
-        <input id="file" type="file" multiple={false} hidden />
-        <input type="text" name="text" placeholder="Tanyakan apa saja..." />
-        <button>
-          <svg
-            viewBox="0 0 384 512"
-            xmlns="http://www.w3.org/2000/svg"
-            height="24px"
-            width="24px"
-            fill="currentColor"
-          >
-            <path d="M374.6 246.6C368.4 252.9 360.2 256 352 256s-16.38-3.125-22.62-9.375L224 141.3V448c0 17.69-14.33 31.1-31.1 31.1S160 465.7 160 448V141.3L54.63 246.6c-12.5 12.5-32.75 12.5-45.25 0s-12.5-32.75 0-45.25l160-160c12.5-12.5 32.75-12.5 45.25 0l160 160C387.1 213.9 387.1 234.1 374.6 246.6z" />
-          </svg>
-        </button>
-      </form>
+
+      {/* Input form */}
+      <div className="prompt-container">
+        <form className="prompt-form" onSubmit={handleSubmit} ref={formRef}>
+          <div className="upload-wrapper">
+            <Upload setImg={setImg} />
+          </div>
+          <input 
+            type="text" 
+            name="text" 
+            placeholder="Tanyakan apa saja..." 
+            autoComplete="off"
+            disabled={loadingAnswer}
+          />
+          <button type="submit" disabled={loadingAnswer}>
+            {loadingAnswer ? (
+              <div className="loading-spinner-small"></div>
+            ) : (
+              <Send className="w-5 h-5" />
+            )}
+          </button>
+        </form>
+      </div>
     </>
   );
 };

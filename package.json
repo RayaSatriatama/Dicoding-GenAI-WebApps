@@ -1,0 +1,21 @@
+{
+  "name": "dicoding-genai-webapps",
+  "version": "1.0.0",
+  "description": "Dicoding Generative AI Education Platform",
+  "scripts": {
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:backend": "cd backend && npx nodemon --env-file .env index.js",
+    "dev:frontend": "cd client && npm run dev",
+    "install:all": "npm install && cd backend && npm install && cd ../client && npm install",
+    "build": "cd client && npm run build"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "keywords": [
+    "dicoding",
+    "genai",
+    "education"
+  ],
+  "license": "MIT"
+}

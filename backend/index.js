@@ -6,7 +6,7 @@ import ImageKit from "imagekit";
 import mongoose from "mongoose";
 import Chat from "./models/chat.js";
 import UserChats from "./models/userChats.js";
-import { ClerkExpressRequireAuth } from "@clerk/clerk-sdk-node";
+import { clerkMiddleware, requireAuth, getAuth } from "@clerk/express";
 import dotenv from "dotenv";
 import upload from "./middleware/fileUpload.js";
 import fileDelete from "./middleware/fileDelete.js";
@@ -24,12 +24,15 @@ const __dirname = path.dirname(__filename);
 
 app.use(
   cors({
-    origin: process.env.CLIENT_URL,
+    origin: process.env.CLIENT_URL || "http://localhost:5173",
     credentials: true,
   })
 );
 
 app.use(express.json());
+
+// Add Clerk middleware for authentication
+app.use(clerkMiddleware());
 
 const connect = async () => {
   try {
@@ -51,8 +54,8 @@ app.get("/api/upload", (req, res) => {
   res.send(result);
 });
 
-app.post("/api/upload", ClerkExpressRequireAuth(), upload.single("file"), async (req, res) => {
-  const userId = req.auth.userId;
+app.post("/api/upload", requireAuth(), upload.single("file"), async (req, res) => {
+  const { userId } = getAuth(req);
   console.log(userId);
 
   if (req.file) {
@@ -85,8 +88,8 @@ app.post("/api/upload", ClerkExpressRequireAuth(), upload.single("file"), async 
   }
 });
 
-app.post("/api/chats", ClerkExpressRequireAuth(), async (req, res) => {
-  const userId = req.auth.userId;
+app.post("/api/chats", requireAuth(), async (req, res) => {
+  const { userId } = getAuth(req);
   const { text } = req.body;
 
   try {
@@ -98,6 +101,12 @@ app.post("/api/chats", ClerkExpressRequireAuth(), async (req, res) => {
 
     const savedChat = await newChat.save();
 
+    // Generate chat title: cut at first period, or max 64 chars
+    const periodIndex = text.indexOf('.');
+    const chatTitle = periodIndex > 0 && periodIndex <= 64 
+      ? text.substring(0, periodIndex + 1) 
+      : text.substring(0, 64);
+
     // CHECK IF THE USERCHATS EXISTS
     const userChats = await UserChats.find({ userId: userId });
 
@@ -108,7 +117,7 @@ app.post("/api/chats", ClerkExpressRequireAuth(), async (req, res) => {
         chats: [
           {
             _id: savedChat._id,
-            title: text.substring(0, 40),
+            title: chatTitle,
           },
         ],
       });
@@ -122,7 +131,7 @@ app.post("/api/chats", ClerkExpressRequireAuth(), async (req, res) => {
           $push: {
             chats: {
               _id: savedChat._id,
-              title: text.substring(0, 40),
+              title: chatTitle,
             },
           },
         }
@@ -136,11 +145,16 @@ app.post("/api/chats", ClerkExpressRequireAuth(), async (req, res) => {
   }
 });
 
-app.get("/api/userchats", ClerkExpressRequireAuth(), async (req, res) => {
-  const userId = req.auth.userId;
+app.get("/api/userchats", requireAuth(), async (req, res) => {
+  const { userId } = getAuth(req);
 
   try {
     const userChats = await UserChats.find({ userId });
+
+    // Return empty array if user has no chats yet
+    if (!userChats || userChats.length === 0 || !userChats[0].chats) {
+      return res.status(200).send([]);
+    }
 
     res.status(200).send(userChats[0].chats);
   } catch (err) {
@@ -149,8 +163,8 @@ app.get("/api/userchats", ClerkExpressRequireAuth(), async (req, res) => {
   }
 });
 
-app.get("/api/chats/:id", ClerkExpressRequireAuth(), async (req, res) => {
-  const userId = req.auth.userId;
+app.get("/api/chats/:id", requireAuth(), async (req, res) => {
+  const { userId } = getAuth(req);
 
   try {
     const chat = await Chat.findOne({ _id: req.params.id, userId });
@@ -162,8 +176,8 @@ app.get("/api/chats/:id", ClerkExpressRequireAuth(), async (req, res) => {
   }
 });
 
-app.put("/api/chats/:id", ClerkExpressRequireAuth(), async (req, res) => {
-  const userId = req.auth.userId;
+app.put("/api/chats/:id", requireAuth(), async (req, res) => {
+  const { userId } = getAuth(req);
   const { question, answer, img } = req.body;
 
   const newItems = [
@@ -199,8 +213,8 @@ app.put("/api/chats/:id", ClerkExpressRequireAuth(), async (req, res) => {
 });
 
 
-app.delete("/api/chats/:id", ClerkExpressRequireAuth(), async (req, res) => {
-  const userId = req.auth.userId;
+app.delete("/api/chats/:id", requireAuth(), async (req, res) => {
+  const { userId } = getAuth(req);
   const chatId = req.params.id;
 
   console.log(`Attempting to delete chat with ID: ${chatId} for user ID: ${userId}`);
@@ -227,7 +241,7 @@ app.delete("/api/chats/:id", ClerkExpressRequireAuth(), async (req, res) => {
   }
 });
 
-app.delete('/api/delete/:userId/:path', ClerkExpressRequireAuth(), async (req, res) => {
+app.delete('/api/delete/:userId/:path', requireAuth(), async (req, res) => {
   const { userId, path: filePath } = req.params;
 
   console.log(`Attempting to delete document for user ID: ${userId} with path: ${filePath}`);
@@ -259,8 +273,8 @@ app.delete('/api/delete/:userId/:path', ClerkExpressRequireAuth(), async (req, r
   }
 });
 
-app.post("/api/documents", ClerkExpressRequireAuth(), async (req, res) => {
-  const userId = req.auth.userId;
+app.post("/api/documents", requireAuth(), async (req, res) => {
+  const { userId } = getAuth(req);
   const { title, size, type } = req.body;
 
   try {
@@ -280,8 +294,8 @@ app.post("/api/documents", ClerkExpressRequireAuth(), async (req, res) => {
   }
 });
 
-app.get("/api/documents", ClerkExpressRequireAuth(), async (req, res) => {
-  const userId = req.auth.userId;
+app.get("/api/documents", requireAuth(), async (req, res) => {
+  const { userId } = getAuth(req);
 
   try {
     // Only fetch documents for the current user

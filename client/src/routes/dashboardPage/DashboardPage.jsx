@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import "./dashboardPage.css";
 import { useNavigate } from "react-router-dom";
+import { MessageSquare, FileSearch, HelpCircle, Send, Sparkles } from "lucide-react";
 
 const DashboardPage = () => {
   const queryClient = useQueryClient();
@@ -35,41 +36,82 @@ const DashboardPage = () => {
 
     mutation.mutate(text);
   };
+
+  const handleOptionClick = (text) => {
+    mutation.mutate(text);
+  };
+
   return (
     <div className="dashboardPage">
-      <div className="texts">
-        <div className="logo">
-          <img src="/logo.png" alt="" />
+      <div className="dashboard-content">
+        <div className="welcome-section">
+          <div className="welcome-icon">
+            <Sparkles className="w-8 h-8 text-primary" />
+          </div>
+          <h1 className="welcome-title">Halo! Ada yang bisa saya bantu?</h1>
+          <p className="welcome-subtitle">
+            Pilih salah satu opsi di bawah atau ketik pertanyaan Anda
+          </p>
         </div>
-        <div className="options">
-          <div className="option">
-            <img src="/chat.png" alt="" />
-            <span>Buat Soal Baru</span>
-          </div>
-          <div className="option">
-            <img src="/image.png" alt="" />
-            <span>Analisis Dokumen</span>
-          </div>
-          <div className="option">
-            <img src="/code.png" alt="" />
-            <span>Bantu Saya</span>
-          </div>
+
+        <div className="options-grid">
+          <button
+            className="option-card"
+            onClick={() => handleOptionClick("Buatkan saya soal pilihan ganda tentang pemrograman dasar")}
+          >
+            <div className="option-icon">
+              <MessageSquare className="w-6 h-6" />
+            </div>
+            <div className="option-content">
+              <h3>Buat Soal Baru</h3>
+              <p>Generate soal pilihan ganda, essay, atau true/false</p>
+            </div>
+          </button>
+
+          <button
+            className="option-card"
+            onClick={() => handleOptionClick("Bantu saya menganalisis dokumen yang sudah saya upload")}
+          >
+            <div className="option-icon">
+              <FileSearch className="w-6 h-6" />
+            </div>
+            <div className="option-content">
+              <h3>Analisis Dokumen</h3>
+              <p>Ekstrak informasi dari dokumen yang di-upload</p>
+            </div>
+          </button>
+
+          <button
+            className="option-card"
+            onClick={() => handleOptionClick("Saya butuh bantuan untuk belajar")}
+          >
+            <div className="option-icon">
+              <HelpCircle className="w-6 h-6" />
+            </div>
+            <div className="option-content">
+              <h3>Bantu Saya</h3>
+              <p>Tanya jawab seputar materi pembelajaran</p>
+            </div>
+          </button>
         </div>
       </div>
-      <div className="formContainer">
-        <form onSubmit={handleSubmit}>
-          <input type="text" name="text" placeholder="Tanyakan apa saja..." />
-          <button>
-          <svg
-            viewBox="0 0 384 512"
-            xmlns="http://www.w3.org/2000/svg"
-            height="24px"
-            width="24px"
-            fill="currentColor"
-          >
-            <path d="M374.6 246.6C368.4 252.9 360.2 256 352 256s-16.38-3.125-22.62-9.375L224 141.3V448c0 17.69-14.33 31.1-31.1 31.1S160 465.7 160 448V141.3L54.63 246.6c-12.5 12.5-32.75 12.5-45.25 0s-12.5-32.75 0-45.25l160-160c12.5-12.5 32.75-12.5 45.25 0l160 160C387.1 213.9 387.1 234.1 374.6 246.6z"/>
-          </svg>
-        </button>
+
+      <div className="input-container">
+        <form onSubmit={handleSubmit} className="input-form">
+          <input 
+            type="text" 
+            name="text" 
+            placeholder="Tanyakan apa saja..." 
+            autoComplete="off"
+            disabled={mutation.isPending}
+          />
+          <button type="submit" disabled={mutation.isPending}>
+            {mutation.isPending ? (
+              <div className="loading-spinner-small"></div>
+            ) : (
+              <Send className="w-5 h-5" />
+            )}
+          </button>
         </form>
       </div>
     </div>

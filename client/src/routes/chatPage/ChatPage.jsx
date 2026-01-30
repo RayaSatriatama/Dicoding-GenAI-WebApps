@@ -2,10 +2,10 @@ import "./chatPage.css";
 import NewPrompt from "../../components/newPrompt/NewPrompt";
 import { useQuery } from "@tanstack/react-query";
 import { useLocation } from "react-router-dom";
-import Markdown from "react-markdown";
 import { IKImage } from "imagekitio-react";
 import React, { useState } from 'react';
 import TypingAnimation from '../../style/TypingAnimation';
+import { Bot, User, AlertCircle } from "lucide-react";
 
 const speed = 1;
 
@@ -20,7 +20,6 @@ const ChatPage = () => {
         credentials: "include",
       }).then((res) => {
         if (!res.ok) {
-          // Handle server-side error
           throw new Error('Server error');
         }
         return res.json();
@@ -37,82 +36,86 @@ const ChatPage = () => {
   };
 
   const renderQuestionForm = (questions) => {
-    return questions.map((question) => {
+    return questions.map((question, index) => {
       switch (question.type) {
         case "multiple_choice":
           return (
-            <div key={question.id}>
-              <b>
-                <TypingAnimation text={`Pertanyaan: ${question.question}`} speed={speed} />
-              </b>
-              {question.options.map((option) => (
-                <div key={option.id} style={{ display: 'flex', alignItems: 'center' }}>
-                  <input type="radio" id={option.id} name={question.id} />
-                  <label htmlFor={option.id} style={{ marginLeft: '8px' }}>
-                    <TypingAnimation text={option.text} speed={speed} />
+            <div key={question.id} className="question-card">
+              <div className="question-header">
+                <span className="question-number">Soal {index + 1}</span>
+                <span className="question-type">Pilihan Ganda</span>
+              </div>
+              <p className="question-text">{question.question}</p>
+              <div className="options-list">
+                {question.options.map((option) => (
+                  <label key={option.id} className="option-item">
+                    <input type="radio" name={question.id} />
+                    <span className="option-text">{option.text}</span>
                   </label>
+                ))}
+              </div>
+              <div className="answer-section">
+                <div className="answer-item">
+                  <strong>Jawaban:</strong> {String(question.correct_answer)}
                 </div>
-              ))}
-              <br />
-              <b>
-                <TypingAnimation text={`Jawaban: ${String(question.correct_answer)}`} speed={speed} />
-              </b>
-              <b>
-                <TypingAnimation text={`Penjelasan: ${question.explanation}`} speed={speed} />
-              </b>
-              <br />
+                <div className="explanation-item">
+                  <strong>Penjelasan:</strong> {question.explanation}
+                </div>
+              </div>
             </div>
           );
         case "multibox":
           return (
-            <div key={question.id}>
-              <b>
-                <TypingAnimation text={`Pertanyaan: ${question.question}`} speed={speed} />
-              </b>
-              {question.options.map((option) => (
-                <div key={option.id} style={{ display: 'flex', alignItems: 'center' }}>
-                  <input type="checkbox" id={option.id} name={question.id} />
-                  <label htmlFor={option.id} style={{ marginLeft: '8px' }}>
-                    <TypingAnimation text={option.text} speed={speed} />
+            <div key={question.id} className="question-card">
+              <div className="question-header">
+                <span className="question-number">Soal {index + 1}</span>
+                <span className="question-type">Multi Jawaban</span>
+              </div>
+              <p className="question-text">{question.question}</p>
+              <div className="options-list">
+                {question.options.map((option) => (
+                  <label key={option.id} className="option-item checkbox">
+                    <input type="checkbox" name={question.id} />
+                    <span className="option-text">{option.text}</span>
                   </label>
+                ))}
+              </div>
+              <div className="answer-section">
+                <div className="answer-item">
+                  <strong>Jawaban:</strong> {String(question.correct_answer)}
                 </div>
-              ))}
-              <br />
-              <b>
-                <TypingAnimation text={`Jawaban: ${String(question.correct_answer)}`} speed={speed} />
-              </b>
-              <b>
-                <TypingAnimation text={`Penjelasan: ${question.explanation}`} speed={speed} />
-              </b>
-              <br />
+                <div className="explanation-item">
+                  <strong>Penjelasan:</strong> {question.explanation}
+                </div>
+              </div>
             </div>
           );
         case "true_false":
           return (
-            <div key={question.id}>
-              <b>
-                <TypingAnimation text={`Pertanyaan: ${question.question}`} speed={speed} />
-              </b>
-              <div style={{ display: 'flex', alignItems: 'center' }}>
-                <input type="radio" id={`true-${question.id}`} name={question.id} />
-                <label htmlFor={`true-${question.id}`} style={{ marginLeft: '8px' }}>
-                  <TypingAnimation text="True" speed={speed} />
+            <div key={question.id} className="question-card">
+              <div className="question-header">
+                <span className="question-number">Soal {index + 1}</span>
+                <span className="question-type">Benar/Salah</span>
+              </div>
+              <p className="question-text">{question.question}</p>
+              <div className="options-list tf-options">
+                <label className="option-item">
+                  <input type="radio" name={question.id} />
+                  <span className="option-text">Benar</span>
+                </label>
+                <label className="option-item">
+                  <input type="radio" name={question.id} />
+                  <span className="option-text">Salah</span>
                 </label>
               </div>
-              <div style={{ display: 'flex', alignItems: 'center' }}>
-                <input type="radio" id={`false-${question.id}`} name={question.id} />
-                <label htmlFor={`false-${question.id}`} style={{ marginLeft: '8px' }}>
-                  <TypingAnimation text="False" speed={speed} />
-                </label>
+              <div className="answer-section">
+                <div className="answer-item">
+                  <strong>Jawaban:</strong> {String(question.correct_answer)}
+                </div>
+                <div className="explanation-item">
+                  <strong>Penjelasan:</strong> {question.explanation}
+                </div>
               </div>
-              <br />
-              <b>
-                <TypingAnimation text={`Jawaban: ${String(question.correct_answer)}`} speed={speed} />
-              </b>
-              <b>
-                <TypingAnimation text={`Penjelasan: ${question.explanation}`} speed={speed} />
-              </b>
-              <br />
             </div>
           );
         default:
@@ -125,17 +128,27 @@ const ChatPage = () => {
 
   return (
     <div className="chatPage">
-      <div className="wrapper">
-        <div className="chat">
+      <div className="chat-wrapper">
+        <div className="chat-container">
           {isPending || loadingMessages ? (
-            <div className="loading-spinner"></div>
+            <div className="loading-container">
+              <div className="loading-dots">
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
+              <p className="loading-text">Memuat percakapan...</p>
+            </div>
           ) : error ? (
-            "Something went wrong!"
+            <div className="error-container">
+              <AlertCircle className="w-12 h-12 text-red-400" />
+              <p>Terjadi kesalahan saat memuat chat</p>
+            </div>
           ) : (
             data?.history?.map((message, i) => (
               <React.Fragment key={i}>
                 {message.img && message.img.trim() !== "" && (
-                  <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                  <div className="image-message">
                     <IKImage
                       urlEndpoint={import.meta.env.VITE_IMAGE_KIT_ENDPOINT}
                       path={message.img}
@@ -144,19 +157,32 @@ const ChatPage = () => {
                       transformation={[{ height: 300, width: 400 }]}
                       loading="lazy"
                       lqip={{ active: true, quality: 20 }}
-                      style={{ alignSelf: 'flex-end' }}
+                      className="chat-image"
                     />
                   </div>
                 )}
                 <div
-                  className={message.role === "user" ? "message user" : "message"}
+                  className={`message-bubble ${message.role === "user" ? "user" : "assistant"}`}
                   onLoad={() => setLoadingMessages(false)}
                 >
-                  {isValidJSON(message.parts[0].text) ? (
-                    renderQuestionForm(JSON.parse(message.parts[0].text).questions)
-                  ) : (
-                    <TypingAnimation text={message.parts[0].text} speed={speed} />
-                  )}
+                  <div className="message-avatar">
+                    {message.role === "user" ? (
+                      <User className="w-5 h-5" />
+                    ) : (
+                      <Bot className="w-5 h-5" />
+                    )}
+                  </div>
+                  <div className="message-content">
+                    {isValidJSON(message.parts[0].text) ? (
+                      <div className="questions-container">
+                        {renderQuestionForm(JSON.parse(message.parts[0].text).questions)}
+                      </div>
+                    ) : (
+                      <div className="message-text">
+                        <TypingAnimation text={message.parts[0].text} speed={speed} />
+                      </div>
+                    )}
+                  </div>
                 </div>
               </React.Fragment>
             ))
