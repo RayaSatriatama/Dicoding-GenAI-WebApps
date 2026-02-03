@@ -6,7 +6,7 @@ services:
     hostname: mongodb
     restart: unless-stopped
     ports:
-      - "27017:27017" # Exposed as requested
+      - "127.0.0.1:27017:27017" # Exposed as requested
     volumes:
       - mongodb_data:/data/db
       - mongodb_config:/data/configdb
@@ -30,7 +30,7 @@ services:
     hostname: backend
     restart: unless-stopped
     ports:
-      - "127.0.0.1:3001:3000" # Restricted to localhost to prevent public access
+      - "3001:3000" # Restricted to localhost to prevent public access
     environment:
       - PORT=3000
       - MONGO=mongodb://mongodb:27017/aichat
