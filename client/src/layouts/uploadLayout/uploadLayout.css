@@ -1,82 +1,74 @@
 .uploadLayout {
   display: flex;
-  height: calc(100vh - 110px);
+  height: 100%; /* Changed from calc(100vh - 110px) to fill available space */
+  flex: 1;
   gap: 1.5rem;
   position: relative;
   overflow: hidden;
+  align-items: stretch;
 }
 
 /* Sidebar */
 .uploadLayout .sidebar {
-  width: 280px;
+  width: 260px;
   flex-shrink: 0;
   background: white;
-  border-radius: 1.5rem;
-  padding: 1.5rem;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+  border-radius: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
   border: 1px solid #E2E8F0;
   overflow: hidden;
-  transition: width 0.25s ease-out, opacity 0.25s ease-out;
+  transition: transform 0.25s ease-out, opacity 0.25s ease-out;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Sidebar header - contains close button and logo */
+.uploadLayout .sidebar-header {
+  display: none; /* Hidden on desktop */
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem;
+  border-bottom: 1px solid #E2E8F0;
+  flex-shrink: 0;
+}
+
+.uploadLayout .close-sidebar-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: #F8FAFC;
+  color: #475569;
+  border: 1px solid #E2E8F0;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.2s ease-out;
+  flex-shrink: 0;
+}
+
+.uploadLayout .close-sidebar-btn:hover {
+  background: #E2E8F0;
+  color: #1E3A5F;
+}
+
+.uploadLayout .sidebar-logo {
+  height: 24px;
+  width: auto;
+  object-fit: contain;
 }
 
 /* Main content */
 .uploadLayout .content {
   flex: 1;
   background: white;
-  border-radius: 1.5rem;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+  border-radius: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
   border: 1px solid #E2E8F0;
   overflow: hidden;
-}
-
-/* Sidebar toggle button (mobile) */
-.sidebar-toggle {
-  display: none;
-  position: fixed;
-  bottom: 1.5rem;
-  left: 1.5rem;
-  z-index: 60;
-  width: 48px;
-  height: 48px;
-  background: #1E3A5F;
-  color: white;
-  border: none;
-  border-radius: 50%;
-  box-shadow: 0 4px 15px rgba(30, 58, 95, 0.4);
-  cursor: pointer;
-  align-items: center;
-  justify-content: center;
-  transition: background-color 0.15s ease-out, box-shadow 0.15s ease-out;
-}
-
-.sidebar-toggle:hover {
-  background: #2D4A6F;
-  box-shadow: 0 6px 20px rgba(30, 58, 95, 0.5);
-}
-
-/* Settings toggle button (mobile) */
-.settings-toggle {
-  display: none;
-  position: fixed;
-  bottom: 1.5rem;
-  right: 1.5rem;
-  z-index: 60;
-  width: 48px;
-  height: 48px;
-  background: #2D4A6F;
-  color: white;
-  border: none;
-  border-radius: 50%;
-  box-shadow: 0 4px 15px rgba(45, 74, 111, 0.4);
-  cursor: pointer;
-  align-items: center;
-  justify-content: center;
-  transition: background-color 0.15s ease-out, box-shadow 0.15s ease-out;
-}
-
-.settings-toggle:hover {
-  background: #3D5A7F;
-  box-shadow: 0 6px 20px rgba(45, 74, 111, 0.5);
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 /* Sidebar overlay (mobile) */
@@ -165,12 +157,18 @@
 
 /* Responsive */
 @media (max-width: 1024px) {
+  .uploadLayout {
+    gap: 1rem; /* 16px on tablet */
+  }
+
   .uploadLayout .sidebar {
     width: 260px;
   }
+}
 
-  /* Show settings toggle on tablet */
-  .settings-toggle {
+@media (max-width: 764px) {
+  /* Show sidebar header with close button and logo */
+  .uploadLayout .sidebar-header {
     display: flex;
   }
 
@@ -178,16 +176,9 @@
   .settings-overlay {
     display: block;
   }
-}
 
-@media (max-width: 768px) {
   .uploadLayout {
-    gap: 0;
-  }
-
-  /* Show sidebar toggle on mobile */
-  .sidebar-toggle {
-    display: flex;
+    gap: 0.75rem; /* 12px on mobile */
   }
 
   /* Show sidebar overlay on mobile */
@@ -198,14 +189,15 @@
   .uploadLayout .sidebar {
     position: fixed;
     left: 0;
-    top: 80px;
+    top: 0;
     bottom: 0;
     width: 280px;
     max-width: 85vw;
-    border-radius: 0 1.5rem 1.5rem 0;
+    border-radius: 0 1rem 1rem 0;
     z-index: 50;
     transform: translateX(-100%);
     transition: transform 0.25s ease-out;
+    padding: 0; /* Remove padding, handled by header and ChatList */
   }
 
   .uploadLayout .sidebar.open {
@@ -213,26 +205,22 @@
   }
 
   .uploadLayout .content {
-    border-radius: 1rem;
+    border-radius: 0.75rem;
   }
 }
 
 @media (max-width: 480px) {
   .uploadLayout {
     height: calc(100vh - 100px);
+    gap: 0.5rem; /* 8px on small mobile */
   }
 
-  .sidebar-toggle {
-    bottom: 1rem;
-    left: 1rem;
-    width: 44px;
-    height: 44px;
+  .uploadLayout .sidebar {
+    width: 260px;
   }
 
-  .settings-toggle {
-    bottom: 1rem;
-    right: 1rem;
-    width: 44px;
-    height: 44px;
+  .uploadLayout .close-sidebar-btn {
+    width: 36px;
+    height: 36px;
   }
 }

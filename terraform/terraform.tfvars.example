@@ -1,0 +1,8 @@
+project_id            = "your-gcp-project-id"
+region                = "asia-southeast2"
+mongodb_uri           = "mongodb+srv://user:pass@cluster.mongodb.net/dbname"
+clerk_publishable_key = "pk_test_..."
+clerk_secret_key      = "sk_test_..."
+image_kit_endpoint    = "https://ik.imagekit.io/..."
+image_kit_public_key  = "public_..."
+image_kit_private_key = "private_..."

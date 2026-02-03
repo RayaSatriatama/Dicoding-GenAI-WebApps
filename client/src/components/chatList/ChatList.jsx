@@ -4,8 +4,10 @@ import "./chatList.css";
 import { useQuery } from "@tanstack/react-query";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Plus, Upload, Compass, Trash2, MessageCircle } from "lucide-react";
+import { useAuth } from "@clerk/clerk-react";
 
 const ChatList = ({ onNavigate }) => {
+  const { getToken } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const currentChatId = location.pathname.split("/").pop();
@@ -13,8 +15,12 @@ const ChatList = ({ onNavigate }) => {
   const { isPending, error, data, refetch } = useQuery({
     queryKey: ["userChats"],
     queryFn: async () => {
+      const token = await getToken();
       const response = await fetch(`${import.meta.env.VITE_API_URL}/api/userchats`, {
         credentials: "include",
+        headers: {
+          "Authorization": `Bearer ${token}`
+        }
       });
       const chats = await response.json();
       return chats
@@ -26,11 +32,15 @@ const ChatList = ({ onNavigate }) => {
   const handleDelete = async (e, chatId) => {
     e.preventDefault();
     e.stopPropagation();
-    
+
     try {
+      const token = await getToken();
       const response = await fetch(`${import.meta.env.VITE_API_URL}/api/chats/${chatId}`, {
         method: "DELETE",
         credentials: "include",
+        headers: {
+          "Authorization": `Bearer ${token}`
+        }
       });
 
       if (!response.ok) {
@@ -52,19 +62,24 @@ const ChatList = ({ onNavigate }) => {
     if (onNavigate) onNavigate();
   };
 
+  // Check if current path matches
+  const isUploadPage = location.pathname === '/upload';
+  const isExplorePage = location.pathname === '/';
+  const isDashboardPage = location.pathname === '/dashboard';
+
   return (
     <div className="chatList">
       {/* Navigation section */}
       <div className="nav-section">
-        <Link to="/dashboard" onClick={handleNavigation} className="nav-button primary">
+        <Link to="/dashboard" onClick={handleNavigation} className={`nav-button ${isDashboardPage ? 'active' : ''}`}>
           <Plus className="w-4 h-4" />
           <span>Chat Baru</span>
         </Link>
-        <Link to="/upload" onClick={handleNavigation} className="nav-button">
+        <Link to="/upload" onClick={handleNavigation} className={`nav-button ${isUploadPage ? 'active' : ''}`}>
           <Upload className="w-4 h-4" />
           <span>Upload File</span>
         </Link>
-        <Link to="/" onClick={handleNavigation} className="nav-button">
+        <Link to="/" onClick={handleNavigation} className={`nav-button ${isExplorePage ? 'active' : ''}`}>
           <Compass className="w-4 h-4" />
           <span>Jelajahi</span>
         </Link>
@@ -75,7 +90,7 @@ const ChatList = ({ onNavigate }) => {
       {/* Chat history section */}
       <div className="chat-section">
         <span className="section-title">Riwayat Chat</span>
-        
+
         <ScrollArea className="chat-scroll-area">
           {isPending ? (
             <div className="loading-state">
@@ -95,8 +110,8 @@ const ChatList = ({ onNavigate }) => {
           ) : (
             <div className="chat-list-items">
               {data?.map((chat) => (
-                <Link 
-                  key={chat._id} 
+                <Link
+                  key={chat._id}
                   to={`/dashboard/chats/${chat._id}`}
                   onClick={handleNavigation}
                   className={`chat-item ${currentChatId === chat._id ? 'active' : ''}`}
@@ -106,8 +121,8 @@ const ChatList = ({ onNavigate }) => {
                     <span className="chat-title">{chat.title}</span>
                     <span className="chat-title chat-title-duplicate" aria-hidden="true">{chat.title}</span>
                   </div>
-                  <button 
-                    onClick={(e) => handleDelete(e, chat._id)} 
+                  <button
+                    onClick={(e) => handleDelete(e, chat._id)}
                     className="delete-btn"
                     aria-label="Delete chat"
                   >

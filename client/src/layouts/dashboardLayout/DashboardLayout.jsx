@@ -1,15 +1,16 @@
 import { Outlet, useNavigate } from "react-router-dom";
 import "./dashboardLayout.css";
 import { useAuth } from "@clerk/clerk-react";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import ChatList from "../../components/chatList/ChatList";
 import { SettingsPanel } from "../../components/settingsPanel/SettingsPanel";
 import { useSettings } from "../../context/SettingsContext";
-import { Menu, X, Settings } from "lucide-react";
+import { useSidebar } from "../../context/SidebarContext";
+import { X } from "lucide-react";
 
 const DashboardLayout = () => {
   const { userId, isLoaded } = useAuth();
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { sidebarOpen, closeSidebar } = useSidebar();
   const { settingsOpen, setSettingsOpen } = useSettings();
 
   const navigate = useNavigate();
@@ -22,7 +23,7 @@ const DashboardLayout = () => {
 
   // Close sidebars when clicking overlay
   const handleSidebarOverlayClick = () => {
-    setSidebarOpen(false);
+    closeSidebar();
   };
 
   const handleSettingsOverlayClick = () => {
@@ -31,7 +32,7 @@ const DashboardLayout = () => {
 
   // Close sidebar on navigation (mobile)
   const handleSidebarNavigate = () => {
-    setSidebarOpen(false);
+    closeSidebar();
   };
 
   if (!isLoaded) {
@@ -51,24 +52,6 @@ const DashboardLayout = () => {
 
   return (
     <div className="dashboardLayout">
-      {/* Mobile sidebar toggle - Left */}
-      <button 
-        className="sidebar-toggle"
-        onClick={() => setSidebarOpen(!sidebarOpen)}
-        aria-label="Toggle sidebar"
-      >
-        {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-      </button>
-
-      {/* Mobile settings toggle - Right */}
-      <button 
-        className="settings-toggle"
-        onClick={() => setSettingsOpen(!settingsOpen)}
-        aria-label="Toggle settings"
-      >
-        {settingsOpen ? <X className="w-5 h-5" /> : <Settings className="w-5 h-5" />}
-      </button>
-
       {/* Sidebar overlay for mobile */}
       <div 
         className={`sidebar-overlay ${sidebarOpen ? 'active' : ''}`}
@@ -83,6 +66,17 @@ const DashboardLayout = () => {
 
       {/* Left Sidebar */}
       <aside className={`sidebar ${sidebarOpen ? 'open' : ''}`}>
+        {/* Sidebar header with close button and logo (visible when sidebar is open) */}
+        <div className="sidebar-header">
+          <button 
+            className="close-sidebar-btn"
+            onClick={closeSidebar}
+            aria-label="Close sidebar"
+          >
+            <X className="w-5 h-5" />
+          </button>
+          <img src="/certificate_logo.png" alt="Dicoding AI Logo" className="sidebar-logo" />
+        </div>
         <ChatList onNavigate={handleSidebarNavigate} />
       </aside>
 

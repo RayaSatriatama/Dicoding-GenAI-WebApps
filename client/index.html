@@ -8,39 +8,6 @@
   </head>
   <body>
     <div id="root"></div>
-    <!-- n8n chat widget disabled
-    <link href="https://cdn.jsdelivr.net/npm/@n8n/chat/dist/style.css" rel="stylesheet" />
-    <script type="module">
-      import { createChat } from "https://cdn.jsdelivr.net/npm/@n8n/chat/dist/chat.bundle.es.js";
-
-      createChat({
-        webhookUrl: 'http://localhost:5678/webhook/1ed6f50a-4cdb-4247-9876-7b9ca090170d/chat',
-        webhookConfig: {
-          method: 'POST',
-          headers: {}
-        },
-        target: '#n8n-chat',
-        mode: 'window',
-        chatInputKey: 'chatInput',
-        chatSessionKey: 'sessionId',
-        metadata: {},
-        showWelcomeScreen: false,
-        defaultLanguage: 'en',
-        initialMessages: [
-          'Hi perkenalkan saya adalah AI dari Dicoding yang akan menjawab pertanyaan anda berdasarkan materi yang anda sedang pelajari'
-        ],
-        i18n: {
-          en: {
-            title: 'Dicoding GEN AI',
-            subtitle: "Saya adalah AI yang menjawab pertanyaan anda",
-            footer: '',
-            getStarted: 'Mulai Chat',
-            inputPlaceholder: 'Ketik pertanyaan anda..',
-          },
-        },
-      });
-    </script>
-    -->
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

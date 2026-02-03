@@ -1,33 +1,29 @@
 .rootLayout {
-  min-height: 100vh;
+  height: 100vh;
   display: flex;
   flex-direction: column;
   background: linear-gradient(180deg, #F8FAFC 0%, #EFF6FF 100%);
+  padding: 1.5rem; /* 24px consistent padding */
+  gap: 1.5rem; /* 24px gap between header and content */
+  overflow: hidden;
 }
 
-/* Floating glassmorphism header */
+/* Header wrapper - contains header and settings button */
+.rootLayout .header-wrapper {
+  position: relative;
+  flex-shrink: 0;
+}
+
+/* Header - inline with content */
 .rootLayout .header-glass {
-  position: sticky;
-  top: 1rem;
-  left: 0;
-  right: 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.875rem 2rem;
-  margin: 0 1.5rem;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(226, 232, 240, 0.8);
+  padding: 0.75rem 1rem; /* 16px horizontal padding */
+  background: white;
+  border: 1px solid #E2E8F0;
   border-radius: 1rem;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
-  z-index: 100;
-  transition: box-shadow 0.2s ease-out;
-}
-
-.rootLayout .header-glass:hover {
-  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
 /* Logo */
@@ -62,7 +58,7 @@
   color: #475569;
   border-radius: 0.5rem;
   cursor: pointer;
-  transition: color 0.15s ease-out, background-color 0.15s ease-out;
+  transition: color 0.2s ease-out, background-color 0.2s ease-out;
 }
 
 .rootLayout .nav-link:hover {
@@ -77,23 +73,52 @@
   gap: 0.75rem;
 }
 
-.rootLayout .settings-btn {
+/* Hamburger button - visible on dashboard mobile only */
+.rootLayout .hamburger-btn {
   display: flex;
   align-items: center;
   justify-content: center;
   width: 40px;
   height: 40px;
-  background: #F1F5F9;
+  background: #F8FAFC;
   color: #475569;
   border: 1px solid #E2E8F0;
   border-radius: 50%;
   cursor: pointer;
-  transition: background-color 0.15s ease-out, color 0.15s ease-out;
+  transition: all 0.2s ease-out;
+  margin-right: auto;
+  box-shadow: 0 2px 8px rgba(30, 58, 95, 0.08);
 }
 
-.rootLayout .settings-btn:hover {
+.rootLayout .hamburger-btn:hover {
   background: #E2E8F0;
   color: #1E3A5F;
+}
+
+/* Mobile settings button - hidden on desktop */
+.rootLayout .settings-mobile-btn {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: #F8FAFC;
+  color: #475569;
+  border: 1px solid #E2E8F0;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.2s ease-out;
+}
+
+.rootLayout .settings-mobile-btn:hover {
+  background: #E2E8F0;
+  color: #1E3A5F;
+}
+
+.rootLayout .settings-mobile-btn.active {
+  background: #1E3A5F;
+  color: white;
+  border-color: #1E3A5F;
 }
 
 .rootLayout .sign-in-btn {
@@ -106,7 +131,7 @@
   border-radius: 0.625rem;
   font-weight: 600;
   font-size: 0.875rem;
-  transition: background-color 0.15s ease-out, box-shadow 0.15s ease-out;
+  transition: background-color 0.2s ease-out, box-shadow 0.2s ease-out;
   box-shadow: 0 2px 10px rgba(30, 58, 95, 0.25);
   cursor: pointer;
 }
@@ -119,15 +144,49 @@
 /* Main content area */
 .rootLayout main {
   flex: 1;
-  padding: 1.5rem;
+  min-height: 0;
+  overflow-y: auto;
 }
 
 /* Responsive */
+@media (max-width: 764px) {
+  /* Show mobile settings button */
+  .rootLayout .settings-mobile-btn {
+    display: flex;
+  }
+
+  /* Show hamburger on mobile */
+  .rootLayout .hamburger-btn.mobile-only {
+    display: flex;
+  }
+
+  /* Hide logo on mobile dashboard */
+  .rootLayout .logo.desktop-only {
+    display: none;
+  }
+
+  /* Hide floating settings button on mobile */
+  .rootLayout .fixed-settings-btn-container {
+    display: none;
+  }
+}
+
+/* Desktop only - hide hamburger */
+@media (min-width: 765px) {
+  .rootLayout .hamburger-btn.mobile-only {
+    display: none;
+  }
+}
+
 @media (max-width: 768px) {
+  .rootLayout {
+    padding: 1rem; /* 16px on tablet */
+    gap: 1rem;
+  }
+
   .rootLayout .header-glass {
-    margin: 0.75rem 0.75rem 0;
-    padding: 0.75rem 1rem;
-    border-radius: 0.875rem;
+    padding: 0.625rem 1rem;
+    border-radius: 0.75rem;
   }
 
   .rootLayout .logo img {
@@ -147,18 +206,29 @@
     border-radius: 0.5rem;
   }
 
-  .rootLayout main {
-    padding: 1rem;
+  .rootLayout .settings-mobile-btn {
+    width: 36px;
+    height: 36px;
   }
 }
 
 @media (max-width: 480px) {
-  .rootLayout .header-glass {
-    margin: 0.5rem;
-    padding: 0.625rem 0.875rem;
+  .rootLayout {
+    padding: 0.75rem; /* 12px on mobile */
+    gap: 0.75rem;
   }
 
-  .rootLayout main {
-    padding: 0.75rem;
+  .rootLayout .header-glass {
+    padding: 0.5rem 0.75rem;
+  }
+
+  .rootLayout .hamburger-btn {
+    width: 36px;
+    height: 36px;
+  }
+
+  .rootLayout .settings-mobile-btn {
+    width: 32px;
+    height: 32px;
   }
 }

@@ -1,0 +1,107 @@
+/* QuestionSetDisplay Component Styles */
+
+.question-set-display {
+  @apply space-y-6;
+}
+
+/* Header */
+.question-set-header {
+  @apply flex flex-col md:flex-row md:items-center md:justify-between gap-4 p-6 bg-gradient-to-r from-primary/10 to-blue-50 rounded-xl border border-primary/20;
+}
+
+.header-info {
+  @apply space-y-2;
+}
+
+.set-title {
+  @apply text-xl font-bold text-slate-900;
+}
+
+.set-description {
+  @apply text-slate-600 text-sm;
+}
+
+.header-stats {
+  @apply flex gap-4;
+}
+
+.stat-item {
+  @apply px-4 py-2 bg-white rounded-lg shadow-sm text-slate-600 text-sm;
+}
+
+.stat-item strong {
+  @apply text-primary font-bold;
+}
+
+/* Progress */
+.progress-section {
+  @apply p-4 bg-slate-50 rounded-xl;
+}
+
+.progress-header {
+  @apply flex justify-between items-center mb-2 text-sm text-slate-600;
+}
+
+.score {
+  @apply font-medium text-primary;
+}
+
+.progress-bar {
+  @apply h-3 bg-slate-200 rounded-full overflow-hidden;
+}
+
+.progress-fill {
+  @apply h-full bg-slate-300 rounded-full transition-all duration-300 relative;
+}
+
+.progress-correct {
+  @apply absolute inset-y-0 left-0 bg-green-500 rounded-full transition-all duration-300;
+}
+
+/* Controls */
+.question-set-controls {
+  @apply flex flex-wrap gap-3;
+}
+
+/* Tips */
+.question-tips {
+  @apply p-4 bg-blue-50 text-blue-800 text-sm rounded-lg border border-blue-100;
+}
+
+/* Questions List */
+.questions-list {
+  @apply space-y-4;
+}
+
+/* Completion Summary */
+.completion-summary {
+  @apply p-6 bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl border border-green-200 text-center;
+}
+
+.completion-summary h3 {
+  @apply text-2xl font-bold text-slate-900 mb-4;
+}
+
+.summary-stats {
+  @apply grid grid-cols-2 md:grid-cols-4 gap-4;
+}
+
+.summary-item {
+  @apply p-4 bg-white rounded-lg shadow-sm;
+}
+
+.summary-item .label {
+  @apply block text-xs text-slate-500 uppercase tracking-wide mb-1;
+}
+
+.summary-item .value {
+  @apply text-2xl font-bold text-slate-800;
+}
+
+.summary-item .value.correct {
+  @apply text-green-600;
+}
+
+.summary-item .value.incorrect {
+  @apply text-red-500;
+}
