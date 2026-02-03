@@ -27,6 +27,10 @@ Our solution integrates LLM with a MERN (MongoDB, Express, React, Node.js) web a
 - **File Upload**: Users can upload documents for RAG processing.
 - **File Download**: Generated outputs can be downloaded as documents.
 - **File Deletion**: Uploaded files can be deleted after use.
+- **Data Privacy & Security**:
+  - **User-Based Filtering**: Users can only access and view their own uploaded documents.
+  - **Ownership Tracking**: All files, including images used in chat, are tracked by user ID.
+  - **Secure Endpoints**: API endpoints for upload, chat, and retrieval are authenticated via Clerk.
 
 ---
 
@@ -54,72 +58,75 @@ Our solution integrates LLM with a MERN (MongoDB, Express, React, Node.js) web a
 
 ### Setup Instructions
 
-#### Frontend
+#### Using Docker Compose (Recommended)
 
-1. Navigate to the frontend directory:
+The easiest way to run the entire application (Frontend, Backend, and Kotaemon) is using Docker Compose.
+
+1. **Configure Environment Variables**:
+   - Create `.env` in the `client` directory (see example below).
+   - Create `.env` in the `backend` directory (see example below).
+   - Ensure you have the `google_credentials.json` if using Google Cloud features.
+
+2. **Run with Docker Compose**:
+
    ```bash
-   cd client
-   ```
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-3. Start the development server:
-   ```bash
-   npm run dev
+   docker compose up -d
    ```
 
-#### Backend
+   This will start:
+   - Frontend at `http://localhost:5173`
+   - Backend at `http://localhost:3001` (mapped to container port 3000)
+   - Kotaemon at `http://localhost:7860`
 
-1. Navigate to the backend directory:
-   ```bash
-   cd backend
-   ```
-2. Create and activate virtual environment:
-   ```bash
-   python -m venv .venv
-   .venv\Scripts\activate  # Windows
-   # source .venv/bin/activate  # Linux/Mac
-   ```
-3. Install dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
-4. Start the server:
-   ```bash
-   python main.py
-   ```
+#### Manual Setup
+
+**Frontend**:
+
+1. `cd client`
+2. `npm install`
+3. `npm run dev`
+
+**Backend**:
+
+1. `cd backend`
+2. `python -m venv .venv`
+3. `.venv\Scripts\activate` (Windows) or `source .venv/bin/activate` (Mac/Linux)
+4. `pip install -r requirements.txt`
+5. `python main.py`
 
 ---
 
 ## Environment Variables
 
-### Frontend `.env` Example
+### Frontend `.env` Example (`client/.env`)
+
 ```env
 VITE_CLERK_PUBLISHABLE_KEY=your_clerk_publishable_key
 VITE_IMAGE_KIT_ENDPOINT=your_imagekit_endpoint
 VITE_IMAGE_KIT_PUBLIC_KEY=your_imagekit_public_key
-VITE_API_URL=http://localhost:8000
+VITE_API_URL=http://localhost:3001
 
-# API endpoints (all on unified backend port 8000)
-VITE_POST_URL_AGENT=http://localhost:8000/api/kotaemon/chat
-VITE_PROXY_URL=http://localhost:8000
-VITE_POST_URL_UPLOAD=http://localhost:8000/api/kotaemon/upload
-VITE_POST_URL_DELETE_VECTOR=http://localhost:8000/api/kotaemon/delete
+# API endpoints (pointing to unified backend)
+VITE_POST_URL_AGENT=http://localhost:3001/api/kotaemon/chat
+VITE_PROXY_URL=http://localhost:3001
+VITE_POST_URL_UPLOAD=http://localhost:3001/api/kotaemon/upload
+VITE_POST_URL_DELETE_VECTOR=http://localhost:3001/api/kotaemon/delete
 VITE_UPLOAD_DIR=C:/path/to/shared/documents/
 ```
 
-### Backend `.env` Example
+### Backend `.env` Example (`backend/.env`)
+
 ```env
 # Server
 HOST=0.0.0.0
-PORT=8000
+PORT=3000
 
 # Kotaemon RAG
-KOTAEMON_URL=http://localhost:7860
+KOTAEMON_URL=http://kotaemon:7860
+KOTAEMON_DB_PATH=/app/ktem_app_data/user_data/sql.db
 
 # MongoDB
-MONGO=mongodb://localhost:27017/aichat
+MONGO=mongodb://mongo:27017/aichat
 DATABASE_NAME=aichat
 
 # Clerk Authentication
@@ -130,7 +137,7 @@ CLERK_SECRET_KEY=your_clerk_secret_key
 GOOGLE_API_KEY=your_google_api_key
 
 # File Upload
-UPLOAD_DIR=C:/path/to/shared/documents/
+UPLOAD_DIR=/app/uploads
 ```
 
 ---
@@ -154,12 +161,12 @@ UPLOAD_DIR=C:/path/to/shared/documents/
 - Users can upload documents to the system. The uploaded file will be indexed by Kotaemon for RAG processing.
 - Example: Upload a document to generate content based on its content.
 
-2. **Download Document**:
+1. **Download Document**:
 
 - Once the document is processed, users can download the generated output or processed file.
 - Example: A PDF or Word document containing the generated content.
 
-3. **Delete Document**:
+1. **Delete Document**:
 
 - Users can delete the uploaded document after processing.
 - Example: Files that are no longer needed can be deleted to save storage space.
@@ -187,6 +194,7 @@ UPLOAD_DIR=C:/path/to/shared/documents/
 2. Deploy the unified Python backend on a cloud hosting platform (e.g., Google Cloud Run, Railway, or Heroku).
 3. Ensure `.env` files are securely managed and credentials are not exposed.
 4. Set up Kotaemon in a Docker container:
+
    ```bash
    docker run -e GRADIO_SERVER_NAME=0.0.0.0 -e GRADIO_SERVER_PORT=7860 \
      -v ./ktem_app_data:/app/ktem_app_data -p 7860:7860 -it --rm \
@@ -210,6 +218,7 @@ python test_document_selection.py
 ```
 
 **Test Coverage:**
+
 - ✅ Backend connectivity
 - ✅ Kotaemon connectivity  
 - ✅ Document listing from Kotaemon database
@@ -218,6 +227,7 @@ python test_document_selection.py
 - ✅ Chat with multiple document selection
 
 **Expected Output:**
+
 ```
 ✅ Backend is running at http://localhost:8000
 ✅ Kotaemon is running at http://localhost:7860
@@ -231,23 +241,25 @@ python test_document_selection.py
 ### Manual Testing
 
 1. **Start all services:**
+
    ```powershell
    .\start-dev.ps1
    ```
 
 2. **Upload a document via Kotaemon UI:**
-   - Open http://localhost:7860
+   - Open <http://localhost:7860>
    - Click "Upload" and select a PDF
    - Wait for indexing (check "Files" tab)
 
 3. **Test document selection:**
-   - Open frontend: http://localhost:5173
+   - Open frontend: <http://localhost:5173>
    - Create new chat
    - Click document selector (📎 icon)
    - Select your uploaded document
    - Ask: "Buatkan ringkasan dokumen ini"
 
 4. **Verify logs:**
+
    ```powershell
    # Backend should log:
    Get-Content logs/backend_*.log -Tail 20
@@ -264,6 +276,7 @@ python test_document_selection.py
 Mengalami masalah? Lihat panduan lengkap di **[docs/TROUBLESHOOTING.md](./docs/TROUBLESHOOTING.md)**
 
 **Common Issues:**
+
 - ✅ **FIXED**: "Skip retrieval because of no selected files" - Dokumen sekarang dipilih dengan benar
 - API Key tidak valid → Configure di Kotaemon UI Settings
 - Quota exceeded → Tunggu atau upgrade ke paid plan
@@ -287,17 +300,23 @@ We welcome contributions! To contribute:
 
 1. Fork the repository.
 2. Create a new feature branch:
+
    ```bash
    git checkout -b feature-name
    ```
+
 3. Commit your changes:
+
    ```bash
    git commit -m "Add feature description"
    ```
+
 4. Push to your branch:
+
    ```bash
    git push origin feature-name
    ```
+
 5. Open a pull request.
 
 ---
