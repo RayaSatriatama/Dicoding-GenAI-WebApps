@@ -23,6 +23,7 @@ import uuid
 import hmac
 import hashlib
 import time
+from datetime import datetime
 
 from fastapi import FastAPI, HTTPException, UploadFile, File, Form, Depends
 from fastapi.middleware.cors import CORSMiddleware
@@ -157,6 +158,128 @@ def connect_to_kotaemon():
         kotaemon_client = None
         api_info = None
         return False
+
+
+async def fetch_kotaemon_file_uuid(filename: str) -> Optional[str]:
+    """
+    Query Kotaemon API to get UUID for a file by filename.
+    
+    This function queries Kotaemon's file list API to find the UUID
+    for a recently uploaded file. Used when SQLite DB is not accessible.
+    """
+    global kotaemon_client
+    
+    if kotaemon_client is None:
+        print("⚠️ Cannot fetch UUID: Kotaemon client not connected")
+        return None
+    
+    try:
+        loop = asyncio.get_running_loop()
+        
+        # Login first
+        try:
+            await loop.run_in_executor(
+                None,
+                lambda: kotaemon_client.predict(KOTAEMON_USERNAME, KOTAEMON_PASSWORD, api_name="/login_1")
+            )
+        except Exception:
+            pass  # Ignore login errors
+        
+        # Try to get file choices from Kotaemon (this returns file list with UUIDs)
+        # The /load_files_2 endpoint returns available files
+        # We need to find an endpoint that lists files with IDs
+        
+        # Option: Use /get_chunks_fn or similar if available
+        # For now, we'll try to query the file selector component
+        try:
+            # This typically returns a DataFrame or list of files
+            result = await loop.run_in_executor(
+                None,
+                lambda: kotaemon_client.predict(api_name="/load_files")
+            )
+            
+            # Parse result to find our file
+            if result and isinstance(result, (list, tuple)):
+                for item in result:
+                    if isinstance(item, dict) and filename in str(item.get('name', '')):
+                        return item.get('id') or item.get('uuid')
+                    elif isinstance(item, (list, tuple)) and len(item) >= 2:
+                        if filename in str(item[1]):  # name is usually index 1
+                            return str(item[0])  # id is usually index 0
+                            
+        except Exception as e:
+            print(f"⚠️ Could not query /load_files: {e}")
+        
+        print(f"⚠️ Could not find UUID for {filename} via Kotaemon API")
+        return None
+        
+    except Exception as e:
+        print(f"❌ Error fetching UUID from Kotaemon: {e}")
+        return None
+
+
+async def store_kotaemon_uuid_in_mongodb(user_id: str, filename: str, kotaemon_uuid: str):
+    """
+    Store Kotaemon UUID in MongoDB for a document.
+    
+    Updates the document record to include kotaemon_uuid field.
+    """
+    try:
+        # Find by path (which includes user_id/filename pattern)
+        result = await db.documents.update_one(
+            {
+                "userId": user_id,
+                "$or": [
+                    {"path": {"$regex": filename}},
+                    {"title": filename}
+                ]
+            },
+            {"$set": {"kotaemon_uuid": kotaemon_uuid, "updatedAt": datetime.utcnow()}}
+        )
+        
+        if result.modified_count > 0:
+            print(f"✅ Stored Kotaemon UUID {kotaemon_uuid} for {filename}")
+            return True
+        else:
+            # Document might not exist yet, create minimal record
+            await db.documents.insert_one({
+                "userId": user_id,
+                "title": filename,
+                "path": f"{user_id}/{filename}",
+                "kotaemon_uuid": kotaemon_uuid,
+                "createdAt": datetime.utcnow(),
+                "updatedAt": datetime.utcnow()
+            })
+            print(f"✅ Created new document record with UUID {kotaemon_uuid}")
+            return True
+            
+    except Exception as e:
+        print(f"❌ Error storing UUID in MongoDB: {e}")
+        return False
+
+
+async def get_kotaemon_uuid_from_mongodb(user_id: str, filename: str) -> Optional[str]:
+    """
+    Get Kotaemon UUID from MongoDB for a document.
+    
+    Returns the stored kotaemon_uuid if available.
+    """
+    try:
+        doc = await db.documents.find_one({
+            "userId": user_id,
+            "$or": [
+                {"path": {"$regex": filename}},
+                {"title": filename}
+            ]
+        })
+        
+        if doc and doc.get("kotaemon_uuid"):
+            return doc["kotaemon_uuid"]
+        return None
+        
+    except Exception as e:
+        print(f"⚠️ Error getting UUID from MongoDB: {e}")
+        return None
 
 
 @asynccontextmanager
@@ -1054,6 +1177,18 @@ async def upload_document(request: UploadRequest, user_id: str = Depends(require
                 )
             )
             print(f"✅ Kotaemon indexing result: {result}")
+
+            # Try to fetch UUID from Kotaemon and store in MongoDB
+            filename = os.path.basename(file_path)
+            try:
+                kotaemon_uuid = await fetch_kotaemon_file_uuid(filename)
+                if kotaemon_uuid:
+                    await store_kotaemon_uuid_in_mongodb(user_id, filename, kotaemon_uuid)
+                    print(f"✅ Stored Kotaemon UUID in MongoDB: {kotaemon_uuid}")
+                else:
+                    print(f"⚠️ Could not get UUID from Kotaemon API for {filename}")
+            except Exception as uuid_error:
+                print(f"⚠️ UUID storage warning: {uuid_error}")
 
             return {
                 "status": "success",

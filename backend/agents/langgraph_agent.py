@@ -399,12 +399,29 @@ Use the provided context information to ensure questions are accurate and releva
                 db_path = os.getenv("KOTAEMON_DB_PATH", 
                     os.path.join(os.path.dirname(__file__), "..", "..", "ktem_app_data", "user_data", "sql.db"))
 
-                conn = sqlite3.connect(db_path)
-                cursor = conn.cursor()
+                # Check if SQLite DB is accessible (might not be if Kotaemon is remote)
+                sqlite_available = os.path.exists(db_path)
                 
-                # Get all index tables first
-                cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name LIKE 'index__%__source'")
-                all_tables = cursor.fetchall()
+                conn = None
+                cursor = None
+                all_tables = []
+                
+                if sqlite_available:
+                    try:
+                        conn = sqlite3.connect(db_path)
+                        cursor = conn.cursor()
+                        cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name LIKE 'index__%__source'")
+                        all_tables = cursor.fetchall()
+                    except Exception as db_err:
+                        print(f"⚠️ SQLite connection failed: {db_err}")
+                        sqlite_available = False
+
+                # Try to get MongoDB db for fallback UUID lookup
+                mongodb_db = None
+                try:
+                    from models import db as mongodb_db
+                except ImportError:
+                    mongodb_db = None
 
                 for doc in docs_for_rag:
                     found_uuid = None
@@ -412,23 +429,38 @@ Use the provided context information to ensure questions are accurate and releva
 
                     # Check if it's already a UUID
                     if re.match(r'^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$', doc, re.I):
-                        # Verify where it lives if possible
-                        found_in_search = False
-                        for (table_name,) in all_tables:
-                             cursor.execute(f"SELECT id FROM {table_name} WHERE id = ?", (doc,))
-                             if cursor.fetchone():
-                                 found_uuid = doc
-                                 found_table = table_name
-                                 found_in_search = True
-                                 break
-                        
-                        if not found_in_search:
-                             # Default to LightRAG if not found
-                             lightrag_uuids.append(doc)
-                             docs_with_uuids.append(doc)
-                             continue
+                        # Already a UUID, use it directly
+                        found_uuid = doc
+                        lightrag_uuids.append(doc)
+                        docs_with_uuids.append(doc)
+                        continue
                     
-                    if not found_uuid:
+                    # Try MongoDB first (works for remote Kotaemon)
+                    if mongodb_db is not None:
+                        try:
+                            # Extract just the filename for lookup
+                            clean_filename = os.path.basename(doc) if '/' in doc or '\\' in doc else doc
+                            
+                            mongo_doc = await mongodb_db.documents.find_one({
+                                "$or": [
+                                    {"path": {"$regex": clean_filename}},
+                                    {"title": clean_filename},
+                                    {"title": doc}
+                                ],
+                                "kotaemon_uuid": {"$exists": True, "$ne": None}
+                            })
+                            
+                            if mongo_doc and mongo_doc.get("kotaemon_uuid"):
+                                found_uuid = mongo_doc["kotaemon_uuid"]
+                                print(f"🔄 LangGraph Agent: Found '{doc}' in MongoDB -> {found_uuid}")
+                                lightrag_uuids.append(found_uuid)
+                                docs_with_uuids.append(found_uuid)
+                                continue
+                        except Exception as mongo_err:
+                            print(f"⚠️ MongoDB UUID lookup failed: {mongo_err}")
+                    
+                    # Fallback to SQLite if available
+                    if sqlite_available and cursor and not found_uuid:
                         # Convert filename to UUID - search all tables
                         for (table_name,) in all_tables:
                             # 1. Exact match
@@ -451,22 +483,26 @@ Use the provided context information to ensure questions are accurate and releva
                                 found_table = table_name
                                 break
                     
-                    if found_uuid and found_table:
+                    if found_uuid:
                         docs_with_uuids.append(found_uuid)
-                        print(f"🔄 LangGraph Agent: Found '{doc}' in {found_table} -> {found_uuid}")
-                        
-                        if "index__1" in found_table:
-                            file_index_uuids.append(found_uuid)
+                        if found_table:
+                            print(f"🔄 LangGraph Agent: Found '{doc}' in {found_table} -> {found_uuid}")
+                            if "index__1" in found_table:
+                                file_index_uuids.append(found_uuid)
+                            else:
+                                lightrag_uuids.append(found_uuid)
                         else:
                             lightrag_uuids.append(found_uuid)
                     else:
                         print(f"⚠️ LangGraph Agent: Could not find UUID for '{doc}'")
 
-                conn.close()
+                if conn:
+                    conn.close()
             except Exception as e:
                 print(f"⚠️ LangGraph Agent UUID conversion error: {e}")
                 docs_with_uuids = docs_for_rag
                 lightrag_uuids = docs_for_rag
+
 
         # Determine file selection mode
         file_selection_mode = 'select' if docs_with_uuids else 'all'
