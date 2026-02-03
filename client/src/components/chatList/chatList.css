@@ -1,222 +1,308 @@
-/* src/components/chatList.css */
+/* ChatList component styles */
 .chatList {
   display: flex;
   flex-direction: column;
   height: 100%;
-  width: 15.625vw;
-
-  hr {
-    border: none;
-    height: 2px;
-    background-color: #000000;
-    opacity: 0.1;
-    border-radius: 5px;
-    margin: 20px 0px;
-  }
-
-  .title {
-    font-weight: bolder;
-    font-size: 16px;
-    margin-bottom: 16px;
-  }
-
-  /* Gaya untuk ScrollArea */
-  .chat-scroll-area {
-    flex: 1; /* Mengambil sisa ruang yang tersedia */
-    max-height: 400px; /* Atur sesuai kebutuhan atau gunakan unit relatif */
-    overflow-y: auto; /* Hanya scroll vertikal */
-    padding-right: 10px; /* Menambahkan padding untuk menggeser konten ke kiri */
-    box-sizing: content-box; /* Pastikan padding tidak mempengaruhi lebar */
-    /* Tambahkan background jika diperlukan */
-  }
-
-  .list {
-    display: flex;
-    flex-direction: column;
-    /* Hapus overflow karena ScrollArea sudah mengurusi scroll */
-    /* overflow: auto; */
-    /* transition: max-height 0.3s ease-out; */
-  }
-
-  .link-container {
-    display: flex;
-    align-items: center;
-    padding: 10px;
-    color: #2d3e50;
-    border-radius: 10px;
-    position: relative;
-    justify-content: space-between;
-    white-space: nowrap;
-    overflow: hidden;
-    flex-wrap: nowrap;
-    width: 100%; /* Sesuaikan dengan ScrollArea */
-    box-sizing: border-box;
-
-    &:hover {
-      color: white;
-      background-color: #2d3e50;
-
-      .delete-button {
-        opacity: 1;
-      }
-
-      &::before,
-      &::after {
-        content: "Running Text ";
-        position: absolute;
-        top: 50%;
-        transform: translateY(-50%);
-        white-space: nowrap;
-        animation: running-text 5s linear infinite;
-      }
-
-      &::before {
-        left: -100%;
-      }
-
-      &::after {
-        right: -100%;
-      }
-    }
-  }
-
-  .upgrade {
-    margin-top: auto;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 12px;
-
-    img {
-      width: 24px;
-      height: 24px;
-    }
-
-    .texts {
-      display: flex;
-      flex-direction: column;
-
-      span {
-        &:first-child {
-          font-weight: 600;
-        }
-
-        &:last-child {
-          color: #888;
-        }
-      }
-    }
-  }
-
-  /* Gaya Scrollbar khusus */
-  .chat-scroll-area::-webkit-scrollbar {
-    width: 12px; /* Lebar scrollbar */
-  }
-
-  .chat-scroll-area::-webkit-scrollbar-track {
-    background-color: #f1f1f1;
-    border-radius: 6px;
-  }
-
-  .chat-scroll-area::-webkit-scrollbar-thumb {
-    background-color: #888; /* Warna scrollbar */
-    border-radius: 6px;
-    border: 3px solid #f1f1f1; /* Memberi jarak 10px secara visual */
-  }
-
-  .chat-scroll-area::-webkit-scrollbar-thumb:hover {
-    background-color: #555;
-  }
-
-  /* Untuk Firefox */
-  .chat-scroll-area {
-    scrollbar-width: thin; /* Pilihan: auto, thin */
-    scrollbar-color: #888 #f1f1f1; /* scrollbar-color: thumb track */
-  }
+  padding: 1rem;
 }
 
-.loading-spinner {
-  border: 8px solid #ececec;
-  border-top: 8px solid #888;
-  border-radius: 50%;
-  width: 40px;
-  height: 40px;
-  animation: spin 1s linear infinite;
-  margin: 20px auto;
+/* Navigation section */
+.nav-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-.chat-title {
-  flex: 1;
-  width: 11.458vw;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  display: inline-block;
-}
-
-.delete-button {
-  margin-top: auto;
-  margin-bottom: auto;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  transition: transform 0.2s ease, opacity 0.2s ease;
-  width: 30px;
-  height: 30px;
+.nav-button {
   display: flex;
   align-items: center;
-  justify-content: center;
-  opacity: 0;
-  position: relative;
-  right: 0;
-  left: 0px;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  border-radius: 0.75rem;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: #475569;
+  cursor: pointer;
+  transition: all 0.2s ease-out;
+}
+
+.nav-button:hover {
+  background: #E8EEF5;
+  border-color: #C8D6E8;
+  color: #1E3A5F;
+}
+
+.nav-button:active {
+  background: #D8E2EF;
+  border-color: #B8C9DE;
+  transform: scale(0.98);
+}
+
+.nav-button.active {
+  background: #1E3A5F;
+  border-color: #1E3A5F;
   color: white;
-  opacity: 0;
-
-  &:hover {
-    transform: scale(1.1);
-  }
-
-  &:active {
-    transform: scale(0.9);
-  }
-
-  svg {
-    fill: currentColor;
-  }
+  box-shadow: 0 2px 8px rgba(30, 58, 95, 0.25);
 }
 
-@media (max-width: 768px) {
-  .link-container {
-    padding: 8px;
-  }
-
-  .chat-title {
-    max-width: 60%;
-  }
+.nav-button.active:hover {
+  background: #2D4A6F;
+  box-shadow: 0 4px 12px rgba(30, 58, 95, 0.35);
 }
 
-@media (max-width: 480px) {
-  .link-container {
-    padding: 6px;
-  }
-
-  .chat-title {
-    max-width: 50%;
-  }
+/* Primary button - always stands out but same active style */
+.nav-button.primary {
+  background: #1E3A5F;
+  border-color: #1E3A5F;
+  color: white;
 }
 
-/* Animasi teks berjalan jika diperlukan */
-@keyframes running-text {
+.nav-button.primary:hover {
+  background: #2D4A6F;
+  box-shadow: 0 4px 12px rgba(30, 58, 95, 0.35);
+}
+
+.nav-button.primary:active {
+  background: #16304D;
+  transform: scale(0.98);
+}
+
+/* Divider */
+.divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #E2E8F0, transparent);
+  margin: 0.5rem 0;
+}
+
+/* Chat section */
+.chat-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  gap: 0.75rem;
+}
+
+.section-title {
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #94A3B8;
+  padding: 0 0.25rem;
+}
+
+/* Scroll area */
+.chat-scroll-area {
+  flex: 1;
+  min-height: 0;
+}
+
+/* Chat list items */
+.chat-list-items {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.chat-item {
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr) 28px;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 0.5rem;
+  border-radius: 0.625rem;
+  color: #475569;
+  cursor: pointer;
+  transition: background-color 0.2s ease-out, color 0.2s ease-out;
+}
+
+.chat-item:hover {
+  background: #F1F5F9;
+}
+
+.chat-item.active {
+  background: linear-gradient(135deg, #E8EEF5 0%, #D8E2EF 100%);
+  color: #1E3A5F;
+}
+
+.chat-item > svg:first-child {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+}
+
+/* Chat title with running text animation */
+.chat-title-wrapper {
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  min-width: 0;
+}
+
+.chat-item .chat-title {
+  font-size: 0.8125rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: #475569;
+  flex-shrink: 0;
+  max-width: none;
+}
+
+.chat-item .chat-title-duplicate {
+  display: none;
+  max-width: none;
+}
+
+/* Running text on hover - add gradient mask */
+.chat-item:hover .chat-title-wrapper {
+  mask-image: linear-gradient(90deg, transparent, black 8%, black 92%, transparent);
+  -webkit-mask-image: linear-gradient(90deg, transparent, black 8%, black 92%, transparent);
+}
+
+.chat-item:hover .chat-title {
+  overflow: visible;
+  text-overflow: clip;
+  padding-right: 2rem;
+  animation: runningText 3.5s linear infinite;
+}
+
+.chat-item:hover .chat-title-duplicate {
+  display: inline;
+  padding-right: 2rem;
+  animation: runningText 3.5s linear infinite;
+}
+
+.chat-item.active .chat-title {
+  color: #1E3A5F;
+}
+
+@keyframes runningText {
   0% {
     transform: translateX(0);
   }
   100% {
-    transform: translateX(100%);
+    transform: translateX(-100%);
+  }
+}
+
+.chat-item .delete-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: transparent;
+  border: none;
+  border-radius: 0.375rem;
+  color: #94A3B8;
+  cursor: pointer;
+  transition: background-color 0.2s ease-out, color 0.2s ease-out;
+}
+
+.chat-item:hover .delete-btn {
+  color: #64748B;
+}
+
+.chat-item .delete-btn:hover {
+  background: #FEE2E2;
+  color: #EF4444;
+}
+
+/* Loading state */
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.25rem;
+}
+
+.skeleton-item {
+  height: 44px;
+  background: linear-gradient(90deg, #F1F5F9 25%, #E2E8F0 50%, #F1F5F9 75%);
+  background-size: 200% 100%;
+  border-radius: 0.625rem;
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Error state */
+.error-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+  text-align: center;
+}
+
+.error-state p {
+  font-size: 0.875rem;
+  color: #EF4444;
+}
+
+/* Empty state */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+  gap: 0.75rem;
+  text-align: center;
+}
+
+.empty-state p {
+  font-size: 0.875rem;
+  color: #94A3B8;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .chatList {
+    padding: 0.75rem;
+  }
+
+  .nav-button {
+    padding: 0.625rem 0.75rem;
+    font-size: 0.8125rem;
+  }
+
+  .chat-item {
+    padding: 0.5rem 0.375rem;
+    gap: 0.375rem;
+  }
+
+  .chat-item .chat-title {
+    max-width: 100px;
+    font-size: 0.75rem;
+  }
+
+  .chat-item .delete-btn {
+    width: 22px;
+    height: 22px;
+    min-width: 22px;
+  }
+
+  .chat-item .delete-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .chat-item .chat-title {
+    max-width: 80px;
   }
 }

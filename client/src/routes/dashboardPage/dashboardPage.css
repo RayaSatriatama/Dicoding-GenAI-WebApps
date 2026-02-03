@@ -1,151 +1,230 @@
 .dashboardPage {
-  height: 100%;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  background: linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 100%);
+  border-radius: 1rem;
+  overflow: hidden;
+  min-height: 0;
+}
+
+/* Main content area */
+.dashboard-content {
+  flex: 1 1 0;
   display: flex;
   flex-direction: column;
   align-items: center;
-  position: relative;
-  background-color: white;
+  justify-content: center;
+  padding: 1rem;
+  gap: 2rem;
+  overflow-y: auto;
+}
 
-  .texts {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    width: 50%;
-    gap: 50px;
+/* Welcome section */
+.welcome-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 1rem;
+  animation: fadeIn 0.5s ease-out;
+}
 
-    .logo {
-      display: flex;
-      align-items: center;
-      gap: 20px;
-      opacity: 0.2;
+.welcome-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  background: linear-gradient(135deg, rgba(30, 58, 95, 0.1), rgba(45, 74, 111, 0.1));
+  border-radius: 1rem;
+  margin-bottom: 0.5rem;
+}
 
-      img {
-        width: 64px;
-        height: 64px;
-      }
+.welcome-title {
+  font-family: 'Poppins', sans-serif;
+  font-size: clamp(1.5rem, 4vw, 2.25rem);
+  font-weight: 700;
+  color: #1E293B;
+  line-height: 1.2;
+}
 
-      h1 {
-        font-size: 96px;
-        background: #2d3e50;
-        background-clip: text;
-        -webkit-background-clip: text;
-        color: transparent;
-      }
-    }
+.welcome-subtitle {
+  font-size: 1rem;
+  color: #64748B;
+  max-width: 400px;
+}
 
-    .options {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 50px;
+/* Options grid */
+.options-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+  width: 100%;
+  max-width: 800px;
+  animation: slideUp 0.6s ease-out;
+}
 
-      .option {
-        height: 130px;
-        width: 130px;
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-        font-weight: 300;
-        font-size: 14px;
-        padding: 20px;
-        border-radius: 20px;
-        box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
-        align-items: center;
-        text-align: center;
+.option-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.5rem;
+  background: white;
+  border: 1px solid #E2E8F0;
+  border-radius: 1rem;
+  cursor: pointer;
+  transition: border-color 0.2s ease-out, box-shadow 0.2s ease-out;
+  text-align: center;
+}
 
-        img {
-          width: 40px;
-          height: 40px;
-          object-fit: cover;
-        }
-      }
-    }
+.option-card:hover {
+  border-color: #1E3A5F;
+  box-shadow: 0 8px 20px rgba(30, 58, 95, 0.1);
+}
+
+.option-card:active {
+  box-shadow: 0 4px 12px rgba(30, 58, 95, 0.08);
+}
+
+.option-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  background: linear-gradient(135deg, #E8EEF5 0%, #D8E2EF 100%);
+  border-radius: 0.875rem;
+  color: #1E3A5F;
+  transition: background 0.2s ease-out, color 0.2s ease-out;
+}
+
+.option-card:hover .option-icon {
+  background: linear-gradient(135deg, #1E3A5F 0%, #2D4A6F 100%);
+  color: white;
+}
+
+.option-content h3 {
+  font-family: 'Poppins', sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1E293B;
+  margin-bottom: 0.25rem;
+}
+
+.option-content p {
+  font-size: 0.875rem;
+  color: #64748B;
+  line-height: 1.4;
+}
+
+@keyframes fadeIn {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+@keyframes slideUp {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
   }
-  .formContainer {
-    margin-top: auto;
-    width: 80%;
-    background-color: #ececec;
-    border-radius: 20px;
-    display: flex;
-
-    form {
-      width: 80vw;
-      max-width: 800px;
-      position: fixed;
-      left: 58%;
-      transform: translateX(-50%);
-      bottom: 40px;
-      background-color: #ececec;
-      border-radius: 20px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 0px 10px;
-      box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
-      margin: 0 20px;
-
-      input {
-        flex: 1;
-        padding: 20px 10px;
-        border: none;
-        outline: none;
-        background-color: transparent;
-        color: #2c2937;
-      }
-
-      button {
-        color: #2c2937;
-        border-radius: 50%;
-        background-color: #ececec;
-        border: none;
-        cursor: pointer;
-        padding: 10px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-right: 10px;
-        transition: background-color 0.3s;
-      }
-
-      button:hover {
-        color: #ececec;
-        background-color: #dcdbdb;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-      }
-    }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
-@media (max-width: 1024px) {
-  .dashboardPage .formContainer form {
-    width: 70vw;
-  }
-}
-
+/* Responsive */
 @media (max-width: 768px) {
-  .dashboardPage .formContainer form {
-    width: 60vw;
-    margin: 0 5vw;
+  .dashboard-content {
+    padding: 1.25rem;
+    gap: 1.5rem;
   }
-}
 
-@media (max-width: 640px) {
-  .dashboardPage .texts .options .option {
-    display: none;
+  .welcome-section {
+    gap: 0.75rem;
+  }
+
+  .welcome-icon {
+    width: 56px;
+    height: 56px;
+  }
+
+  .options-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .option-card {
+    flex-direction: row;
+    text-align: left;
+    padding: 1rem;
+  }
+
+  .option-icon {
+    width: 48px;
+    height: 48px;
+  }
+
+  .option-content {
+    flex: 1;
   }
 }
 
 @media (max-width: 480px) {
-  .dashboardPage .formContainer form input {
-    padding: 15px 10px;
+  .dashboard-content {
+    padding: 1rem;
+    gap: 1.25rem;
   }
 
-  .dashboardPage .formContainer form button,
-  .dashboardPage .formContainer form label {
-    padding: 8px;
+  .welcome-section {
+    gap: 0.5rem;
+  }
+
+  .welcome-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 0.75rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .welcome-title {
+    font-size: 1.25rem;
+  }
+
+  .welcome-subtitle {
+    font-size: 0.8125rem;
+    max-width: 320px;
+  }
+
+  .options-grid {
+    gap: 0.75rem;
+  }
+
+  .option-card {
+    padding: 0.875rem;
+    gap: 0.75rem;
+  }
+
+  .option-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 0.625rem;
+  }
+
+  .option-icon svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .option-content h3 {
+    font-size: 0.875rem;
+  }
+
+  .option-content p {
+    font-size: 0.75rem;
   }
 }
 
