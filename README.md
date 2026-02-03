@@ -76,7 +76,41 @@ The easiest way to run the entire application (Frontend, Backend, and Kotaemon) 
    This will start:
    - Frontend at `http://localhost:5173`
    - Backend at `http://localhost:3001` (mapped to container port 3000)
-   - Kotaemon at `http://localhost:7860`
+
+3. **Start Kotaemon (Required)**:
+   Since using Docker caused compatibility issues on your server, run Kotaemon manually from source:
+
+   **Manual Installation Steps:**
+   1. Clone the repository:
+
+      ```bash
+      git clone https://github.com/Cinnamon/kotaemon.git
+      cd kotaemon
+      ```
+
+   2. Create and activate a fresh environment:
+
+      ```bash
+      conda create -n kotaemon python=3.10
+      conda activate kotaemon
+      # OR using venv
+      python3.10 -m venv .venv
+      source .venv/bin/activate
+      ```
+
+   3. Install dependencies:
+
+      ```bash
+      pip install -e ".[all]"
+      ```
+
+   4. Start the server:
+
+      ```bash
+      python app.py
+      ```
+
+   - Kotaemon UI will be available at `http://localhost:7860`
 
 #### Manual Setup
 

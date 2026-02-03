@@ -3,6 +3,7 @@ services:
   mongodb:
     image: mongo:7
     container_name: dicoding-genai-mongodb
+    hostname: mongodb
     restart: unless-stopped
     ports:
       - "27017:27017" # Exposed as requested
@@ -26,13 +27,14 @@ services:
       context: ./backend
       dockerfile: Dockerfile
     container_name: dicoding-genai-backend
+    hostname: backend
     restart: unless-stopped
     ports:
       - "127.0.0.1:3001:3000" # Restricted to localhost to prevent public access
     environment:
       - PORT=3000
       - MONGO=mongodb://mongodb:27017/aichat
-      - CLIENT_URL=http://localhost:5175
+      - CLIENT_URL=http://${SERVER_HOST}:5175
       - SKIP_AUTH_VERIFICATION=false
       - IMAGE_KIT_ENDPOINT=${IMAGE_KIT_ENDPOINT}
       - IMAGE_KIT_PUBLIC_KEY=${IMAGE_KIT_PUBLIC_KEY}
@@ -40,9 +42,9 @@ services:
       - CLERK_PUBLISHABLE_KEY=${CLERK_PUBLISHABLE_KEY}
       - CLERK_SECRET_KEY=${CLERK_SECRET_KEY}
       - CLERK_JWT_ISSUER=${CLERK_JWT_ISSUER}
-      - ALLOWED_ORIGINS=http://localhost:5173,http://localhost:5174,http://localhost:5175,http://localhost:3000,http://127.0.0.1:5173,http://127.0.0.1:5174,http://127.0.0.1:5175,http://127.0.0.1:3000
+      - ALLOWED_ORIGINS=http://localhost:5173,http://localhost:5174,http://localhost:5175,http://localhost:3000,http://127.0.0.1:5173,http://127.0.0.1:5174,http://127.0.0.1:5175,http://127.0.0.1:3000,http://${SERVER_HOST}:5175,http://${SERVER_HOST}:5173
       - UPLOAD_DIR=/app/uploads
-      - KOTAEMON_URL=${KOTAEMON_URL:-http://host.docker.internal:7860}
+      - KOTAEMON_URL=${KOTAEMON_URL}
       - KOTAEMON_DB_PATH=/app/ktem_app_data/user_data/sql.db
     volumes:
       - ./backend/uploads:/app/uploads
@@ -64,17 +66,17 @@ services:
     container_name: dicoding-genai-frontend
     restart: unless-stopped
     ports:
-      - "127.0.0.1:5175:5173" # Restricted to localhost to prevent public access
+      - "5175:5173" # Restricted to localhost to prevent public access
     environment:
-      - VITE_API_URL=http://localhost:3001
+      - VITE_API_URL=http://${SERVER_HOST}:${BACKEND_PORT}
       - VITE_CLERK_PUBLISHABLE_KEY=${CLERK_PUBLISHABLE_KEY}
       - VITE_IMAGE_KIT_ENDPOINT=${IMAGE_KIT_ENDPOINT}
       - VITE_IMAGE_KIT_PUBLIC_KEY=${IMAGE_KIT_PUBLIC_KEY}
       - VITE_IMAGE_KIT_PUBLIC_KEY=${IMAGE_KIT_PUBLIC_KEY}
-      - VITE_POST_URL_AGENT=http://localhost:3001/api/kotaemon/chat
-      - VITE_PROXY_URL=http://localhost:3001
-      - VITE_POST_URL_UPLOAD=http://localhost:3001/api/kotaemon/upload
-      - VITE_POST_URL_DELETE_VECTOR=http://localhost:3001/api/kotaemon/delete
+      - VITE_POST_URL_AGENT=http://${SERVER_HOST}:${BACKEND_PORT}/api/kotaemon/chat
+      - VITE_PROXY_URL=http://${SERVER_HOST}:${BACKEND_PORT}
+      - VITE_POST_URL_UPLOAD=http://${SERVER_HOST}:${BACKEND_PORT}/api/kotaemon/upload
+      - VITE_POST_URL_DELETE_VECTOR=http://${SERVER_HOST}:${BACKEND_PORT}/api/kotaemon/delete
     depends_on:
       - backend
     networks:
