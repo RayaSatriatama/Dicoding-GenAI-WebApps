@@ -185,28 +185,58 @@ async def fetch_kotaemon_file_uuid(filename: str) -> Optional[str]:
         except Exception:
             pass  # Ignore login errors
         
-        # Try to get file choices from Kotaemon (this returns file list with UUIDs)
-        # The /load_files_2 endpoint returns available files
-        # We need to find an endpoint that lists files with IDs
-        
-        # Option: Use /get_chunks_fn or similar if available
-        # For now, we'll try to query the file selector component
+            # Try to get file choices from Kotaemon (this returns file list with UUIDs)
         try:
             # This typically returns a DataFrame or list of files
-            result = await loop.run_in_executor(
-                None,
-                lambda: kotaemon_client.predict(api_name="/load_files")
-            )
-            
+            # Try multiple potential endpoints
+            result = None
+            for endpoint in ["/load_files_2", "/load_files", "/get_file_list", "/file_list"]:
+                if endpoint in api_info.get("named_endpoints", {}):
+                    print(f"🔍 Testing endpoint {endpoint} for file list...")
+                    try:
+                        result = await loop.run_in_executor(
+                            None,
+                            lambda: kotaemon_client.predict(api_name=endpoint)
+                        )
+                        if result:
+                            # Gradio update object
+                             if isinstance(result, tuple) and len(result) > 0 and isinstance(result[0], dict) and 'choices' in result[0]:
+                                  result = result[0]['choices'] # Extract relevant list
+                                  print(f"✅ Endpoint {endpoint} returned choices list")
+                                  break
+                             
+                             print(f"✅ Endpoint {endpoint} returned raw data: {type(result)}")
+                             if result: # If not empty
+                                 break
+                    except Exception as ep_err:
+                        print(f"⚠️ Endpoint {endpoint} failed: {ep_err}")
+
             # Parse result to find our file
-            if result and isinstance(result, (list, tuple)):
-                for item in result:
-                    if isinstance(item, dict) and filename in str(item.get('name', '')):
-                        return item.get('id') or item.get('uuid')
-                    elif isinstance(item, (list, tuple)) and len(item) >= 2:
-                        if filename in str(item[1]):  # name is usually index 1
-                            return str(item[0])  # id is usually index 0
-                            
+            if result:
+                # Debug result structure (print first item)
+                if isinstance(result, (list, tuple)) and len(result) > 0:
+                     print(f"📄 Sample file item: {result[0]}")
+
+                # List parsing logic
+                if isinstance(result, (list, tuple)):
+                    for item in result:
+                        # 1. Dict format: {'name': 'foo.pdf', 'id': '...'}
+                        if isinstance(item, dict) and filename in str(item.get('name', item.get('filename', ''))):
+                            uuid_val = item.get('id') or item.get('uuid') or item.get('file_id')
+                            if uuid_val:
+                                return str(uuid_val)
+                        
+                        # 2. List/Tuple format: ['filename', 'uuid'] (Common in Kotaemon)
+                        elif isinstance(item, (list, tuple)) and len(item) >= 2:
+                            # Check if filename is index 0
+                            if filename in str(item[0]):
+                                return str(item[1]) # UUID is likely index 1
+                            # Check if filename is index 1
+                            elif filename in str(item[1]):
+                                return str(item[0]) # UUID might be index 0
+
+            # Fallback: Query direct SQL via Gradio if possible? No.
+            
         except Exception as e:
             print(f"⚠️ Could not query /load_files: {e}")
         
